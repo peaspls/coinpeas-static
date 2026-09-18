@@ -63,7 +63,7 @@ jobs:
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          command: deploy --config wrangler.jsonc
+          command: "deploy --config wrangler.jsonc --message \"GitHub Actions (${{ github.event_name == 'schedule' && 'scheduled' || 'manually triggered' }}) deploy — run #${{ github.run_number }}\""
           wranglerVersion: "4.132.0"
 
       - if: vars.DEPLOY_ENABLED == 'true'
