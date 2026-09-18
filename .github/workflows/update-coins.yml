@@ -40,7 +40,16 @@ jobs:
           else
             echo "No COINGECKO_API_KEY set — using CoinGecko's public rate limits."
           fi
-          npm run fetch-coins
+
+          if npm run fetch-coins; then
+            echo "::notice title=Coin fetch succeeded::Fetched fresh coin data from CoinGecko."
+            echo "✅ Fetched fresh coin data." >> "$GITHUB_STEP_SUMMARY"
+          else
+            status=$?
+            echo "::error title=Coin fetch failed::npm run fetch-coins exited with status $status — see logs above."
+            echo "❌ Coin fetch failed (exit $status)." >> "$GITHUB_STEP_SUMMARY"
+            exit $status
+          fi
         env:
           COINGECKO_API_KEY: ${{ secrets.COINGECKO_API_KEY }}
 
@@ -50,12 +59,17 @@ jobs:
       # this step (missing secrets resolve to an empty string, not an
       # error) for as long as the secrets are missing.
       - if: vars.DEPLOY_ENABLED == 'true'
-        uses: cloudflare/wrangler-action@v3
+        uses: cloudflare/wrangler-action@v4
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           command: deploy --config wrangler.jsonc
           wranglerVersion: "4.132.0"
+
+      - if: vars.DEPLOY_ENABLED == 'true'
+        run: |
+          echo "::notice title=Deploy succeeded::coinpeas was deployed to Cloudflare."
+          echo "✅ Deployed to Cloudflare." >> "$GITHUB_STEP_SUMMARY"
 
       - if: vars.DEPLOY_ENABLED != 'true'
         run: |
