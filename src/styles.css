@@ -1,0 +1,519 @@
+/* CoinPeas — calm, eco-inspired dashboard styling. */
+
+:root {
+  --bg: #f7f5ee;
+  --surface: #ffffff;
+  --surface-alt: #f0ece1;
+  --primary: #24603f;
+  --primary-strong: #17422b;
+  --secondary: #7c9a7e;
+  --text: #23281f;
+  --text-muted: #5b6156;
+  --border: #e2ddca;
+  --positive: #2f7d4f;
+  --negative: #b3492f;
+  --shadow: 0 1px 2px rgba(35, 40, 31, 0.06), 0 8px 24px rgba(35, 40, 31, 0.05);
+  --radius: 14px;
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #12180f;
+    --surface: #1a2317;
+    --surface-alt: #202b1c;
+    --primary: #8fd0a2;
+    --primary-strong: #b6e6c3;
+    --secondary: #7fa583;
+    --text: #e7ecdf;
+    --text-muted: #a3ad99;
+    --border: #2a3524;
+    --positive: #7fd39a;
+    --negative: #e08a72;
+    --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 12px 28px rgba(0, 0, 0, 0.35);
+    color-scheme: dark;
+  }
+}
+
+:root[data-theme="dark"] {
+  --bg: #12180f;
+  --surface: #1a2317;
+  --surface-alt: #202b1c;
+  --primary: #8fd0a2;
+  --primary-strong: #b6e6c3;
+  --secondary: #7fa583;
+  --text: #e7ecdf;
+  --text-muted: #a3ad99;
+  --border: #2a3524;
+  --positive: #7fd39a;
+  --negative: #e08a72;
+  --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 12px 28px rgba(0, 0, 0, 0.35);
+  color-scheme: dark;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+.page {
+  max-width: 920px;
+  margin: 0 auto;
+  padding: 28px 20px 56px;
+}
+
+.site-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding-bottom: 20px;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.brand-mark {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: var(--surface-alt);
+  color: var(--primary);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+}
+
+.brand-name {
+  font-size: 1.35rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--primary-strong);
+}
+
+.theme-toggle {
+  display: inline-flex;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 3px;
+  gap: 2px;
+}
+
+.theme-btn {
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  width: 32px;
+  height: 32px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.theme-btn:hover {
+  color: var(--text);
+}
+
+.theme-btn.active {
+  background: var(--surface-alt);
+  color: var(--primary);
+}
+
+.intro {
+  padding: 8px 0 24px;
+}
+
+.intro h1 {
+  font-size: 1.65rem;
+  margin: 0 0 6px;
+  color: var(--text);
+  letter-spacing: -0.01em;
+}
+
+.intro p {
+  margin: 0;
+  color: var(--text-muted);
+}
+
+.panel {
+  /* A tighter, slightly softer palette scoped to the coin list only —
+     matches a reference design given for this component specifically;
+     the rest of the page (header, buttons, spinner) keeps the site's
+     usual tokens. --text-secondary is a third text tone (between --text
+     and --text-muted) this component needs that nothing else on the
+     page uses. */
+  --surface-alt: #f1eee5;
+  --border: #e4e0d4;
+  --text-secondary: #6b7268;
+  --text-muted: #9ba096;
+  --primary: #6b8e63;
+  --primary-strong: #4a6444;
+  --accent-soft: #e6eee2;
+  --positive: #6b8e63;
+  --negative: #c17a5e;
+
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .panel {
+    --surface-alt: #2a2f29;
+    --border: #343a33;
+    --text-secondary: #a6ada1;
+    --text-muted: #767c72;
+    --primary: #8fb586;
+    --primary-strong: #a9cba1;
+    --accent-soft: #2c3a2a;
+    --positive: #8fb586;
+    --negative: #d79379;
+  }
+}
+:root[data-theme="dark"] .panel {
+  --surface-alt: #2a2f29;
+  --border: #343a33;
+  --text-secondary: #a6ada1;
+  --text-muted: #767c72;
+  --primary: #8fb586;
+  --primary-strong: #a9cba1;
+  --accent-soft: #2c3a2a;
+  --positive: #8fb586;
+  --negative: #d79379;
+}
+
+.list-meta {
+  display: flex;
+  justify-content: flex-end;
+  align-items: baseline;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.updated-at,
+.update-interval {
+  font-size: 0.875rem;
+  color: var(--text-muted);
+}
+
+.attribution {
+  display: inline-block;
+  font-size: 0.875rem;
+  color: var(--text-muted);
+  text-decoration: underline;
+}
+
+.retry-btn {
+  border: 1px solid var(--border);
+  background: var(--surface-alt);
+  color: var(--text);
+  border-radius: 8px;
+  padding: 6px 12px;
+  font-size: 0.82rem;
+  cursor: pointer;
+}
+
+.retry-btn:hover {
+  border-color: var(--secondary);
+}
+
+.state-block {
+  padding: 48px 20px;
+  text-align: center;
+  color: var(--text-muted);
+}
+
+.state-block p {
+  margin: 10px 0 0;
+}
+
+.retry-btn-inline {
+  margin-top: 14px;
+}
+
+.pea-spinner {
+  width: 34px;
+  height: 34px;
+  margin: 0 auto;
+  border-radius: 50%;
+  border: 3px solid var(--border);
+  border-top-color: var(--primary);
+  animation: spin 0.9s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.table-wrapper {
+  overflow-x: auto;
+}
+
+.coin-table {
+  width: 100%;
+  table-layout: fixed;
+  border-collapse: collapse;
+  font-variant-numeric: tabular-nums;
+}
+
+.coin-table th {
+  text-align: right;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+  padding: 14px 20px;
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+
+.coin-table th.col-coin {
+  text-align: left;
+}
+
+.coin-table th.col-rank,
+.coin-table td.col-rank {
+  text-align: left;
+}
+
+.coin-table td {
+  padding: 14px 20px;
+  text-align: right;
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.coin-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.coin-table tbody tr:hover {
+  background: var(--surface-alt);
+}
+
+.col-rank {
+  color: var(--text-muted);
+  font-size: 0.8125rem;
+  width: 9%;
+  /* Ranks are always short, plain digits (up to "100") — never truncate
+     them with an ellipsis; the base .coin-table td rule adds that for
+     longer text like coin names, but a clipped number reads as a typo. */
+  text-overflow: clip;
+}
+
+.col-coin {
+  text-align: left;
+  width: 28%;
+}
+
+.col-price {
+  width: 16%;
+  font-size: 0.844rem;
+  color: var(--text);
+}
+
+.col-marketcap {
+  width: 16%;
+  font-size: 0.844rem;
+  color: var(--text-secondary);
+}
+
+.col-change {
+  width: 13%;
+  font-size: 0.8125rem;
+  font-weight: 500;
+}
+
+.col-volume {
+  width: 18%;
+  font-size: 0.844rem;
+  color: var(--text-secondary);
+}
+
+.coin-cell {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  gap: 10px;
+  text-align: left;
+}
+
+.coin-avatar {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: var(--accent-soft);
+  color: var(--primary-strong);
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  font-weight: 600;
+  line-height: 1;
+}
+
+.coin-label {
+  min-width: 0;
+  overflow: hidden;
+}
+
+.coin-name {
+  display: block;
+  font-size: 0.906rem;
+  font-weight: 500;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.coin-symbol {
+  display: block;
+  color: var(--text-muted);
+  font-size: 0.75rem;
+  text-transform: uppercase;
+}
+
+.change-positive {
+  color: var(--positive);
+}
+
+.change-negative {
+  color: var(--negative);
+}
+
+.site-footer {
+  padding-top: 20px;
+  text-align: center;
+}
+
+.site-footer p {
+  margin: 0;
+  font-size: 0.875rem;
+  color: var(--text-muted);
+}
+
+.site-footer > *:not(:first-child) {
+  margin-top: 4px;
+  display: block;
+}
+
+.footer-link {
+  color: inherit;
+  text-decoration: underline;
+}
+
+.site-footer > .footer-mark {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: fit-content;
+  margin: 10px auto;
+  color: var(--text-muted);
+}
+
+.footer-mark svg {
+  display: block;
+}
+
+.footer-mark-text {
+  font-size: 0.875rem;
+  line-height: 1;
+  letter-spacing: -0.01em;
+}
+
+@media (max-width: 640px) {
+  .page {
+    padding: 20px 14px 40px;
+  }
+
+  .col-volume,
+  .col-marketcap,
+  .coin-avatar {
+    display: none;
+  }
+
+  /* The column-width percentages are set per breakpoint (rather than
+     relying on table-layout:auto) so the remaining, visible columns
+     always add up to 100% of the wrapper and the table never needs its
+     own horizontal scroll on top of the page's responsive layout. */
+  .col-rank {
+    width: 12%;
+  }
+
+  .col-coin {
+    width: 38%;
+  }
+
+  .col-price {
+    width: 25%;
+  }
+
+  .col-change {
+    width: 25%;
+  }
+
+  .coin-table th,
+  .coin-table td {
+    padding: 10px 10px;
+  }
+
+  .intro h1 {
+    font-size: 1.35rem;
+  }
+}
+
+@media (max-width: 460px) {
+  .col-rank {
+    width: 14%;
+  }
+
+  .col-coin {
+    width: 34%;
+  }
+
+  .col-price {
+    width: 26%;
+  }
+
+  .col-change {
+    width: 26%;
+  }
+
+  .coin-table th,
+  .coin-table td {
+    padding: 10px 12px;
+  }
+
+  /* Tight breakpoint: give the left-aligned 1-3 digit rank number less
+     room on its inner edge (toward the coin column) than the wider
+     text columns need, while keeping its outer-left padding matched
+     to col-change's outer-right padding so the panel's left and right
+     edges look evenly spaced. */
+  .coin-table th.col-rank,
+  .coin-table td.col-rank {
+    padding-right: 6px;
+  }
+}

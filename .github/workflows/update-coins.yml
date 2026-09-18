@@ -1,0 +1,52 @@
+name: Update coin data
+
+on:
+  schedule:
+    - cron: "*/10 * * * *"
+  workflow_dispatch: {}
+
+concurrency:
+  group: update-coins
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      # dist/ only needs rebuilding when the app itself changes, not
+      # when coins.json changes (that happens on almost every run).
+      - id: dist-cache
+        uses: actions/cache@v4
+        with:
+          path: dist
+          key: dist-${{ hashFiles('index.html', 'src/**', 'public/_headers', 'public/_redirects', 'package-lock.json') }}
+
+      - if: steps.dist-cache.outputs.cache-hit != 'true'
+        run: npm ci
+
+      - if: steps.dist-cache.outputs.cache-hit != 'true'
+        run: npm run build
+
+      - run: npm run fetch-coins
+        env:
+          COINGECKO_API_KEY: ${{ secrets.COINGECKO_API_KEY }}
+
+      # Skipped until the CLOUDFLARE_API_TOKEN/CLOUDFLARE_ACCOUNT_ID secrets
+      # are set up — set the DEPLOY_ENABLED repo variable to "true" once
+      # they're in place. Without this, every scheduled run would fail at
+      # this step (missing secrets resolve to an empty string, not an
+      # error) for as long as the secrets are missing.
+      - if: vars.DEPLOY_ENABLED == 'true'
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: deploy --config wrangler.jsonc
+          wranglerVersion: "4.132.0"

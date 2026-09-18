@@ -1,0 +1,16 @@
+{
+  "name": "coinpeas-static",
+  "private": true,
+  "version": "1.2.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "fetch-coins": "node scripts/fetch-coins.mjs dist/coins.json",
+    "deploy": "npm run build && npm run fetch-coins && wrangler deploy"
+  },
+  "devDependencies": {
+    "vite": "^7.1.0",
+    "wrangler": "^4.102.0"
+  }
+}
