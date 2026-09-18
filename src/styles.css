@@ -1,54 +1,34 @@
-/* CoinPeas — calm, eco-inspired dashboard styling. */
-
 :root {
-  --bg: #f7f5ee;
-  --surface: #ffffff;
-  --surface-alt: #f0ece1;
-  --primary: #24603f;
-  --primary-strong: #17422b;
-  --secondary: #7c9a7e;
-  --text: #23281f;
-  --text-muted: #5b6156;
-  --border: #e2ddca;
-  --positive: #2f7d4f;
-  --negative: #b3492f;
+  color-scheme: light dark;
+  --bg: light-dark(#f7f5ee, #12180f);
+  --surface: light-dark(#ffffff, #1a2317);
+  --surface-alt: light-dark(#f0ece1, #202b1c);
+  --primary: light-dark(#24603f, #8fd0a2);
+  --primary-strong: light-dark(#17422b, #b6e6c3);
+  --secondary: light-dark(#7c9a7e, #7fa583);
+  --text: light-dark(#23281f, #e7ecdf);
+  --text-muted: light-dark(#5b6156, #a3ad99);
+  --border: light-dark(#e2ddca, #2a3524);
+  --positive: light-dark(#2f7d4f, #7fd39a);
+  --negative: light-dark(#b3492f, #e08a72);
   --shadow: 0 1px 2px rgba(35, 40, 31, 0.06), 0 8px 24px rgba(35, 40, 31, 0.05);
+  --shadow-dark: 0 1px 2px rgba(0, 0, 0, 0.3), 0 12px 28px rgba(0, 0, 0, 0.35);
   --radius: 14px;
-  color-scheme: light;
-}
 
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) {
-    --bg: #12180f;
-    --surface: #1a2317;
-    --surface-alt: #202b1c;
-    --primary: #8fd0a2;
-    --primary-strong: #b6e6c3;
-    --secondary: #7fa583;
-    --text: #e7ecdf;
-    --text-muted: #a3ad99;
-    --border: #2a3524;
-    --positive: #7fd39a;
-    --negative: #e08a72;
-    --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 12px 28px rgba(0, 0, 0, 0.35);
-    color-scheme: dark;
+  &[data-theme="light"] {
+    color-scheme: light;
   }
-}
 
-:root[data-theme="dark"] {
-  --bg: #12180f;
-  --surface: #1a2317;
-  --surface-alt: #202b1c;
-  --primary: #8fd0a2;
-  --primary-strong: #b6e6c3;
-  --secondary: #7fa583;
-  --text: #e7ecdf;
-  --text-muted: #a3ad99;
-  --border: #2a3524;
-  --positive: #7fd39a;
-  --negative: #e08a72;
-  --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 12px 28px rgba(0, 0, 0, 0.35);
-  color-scheme: dark;
+  &[data-theme="dark"] {
+    color-scheme: dark;
+    --shadow: var(--shadow-dark);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    &:not([data-theme="light"]) {
+      --shadow: var(--shadow-dark);
+    }
+  }
 }
 
 * {
@@ -111,26 +91,30 @@ body {
   gap: 2px;
 }
 
-.theme-btn {
+.theme-btn,
+.info-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   border: none;
-  background: transparent;
+  background: none;
+  cursor: pointer;
+}
+
+.theme-btn {
   color: var(--text-muted);
   width: 32px;
   height: 32px;
   border-radius: 999px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-}
 
-.theme-btn:hover {
-  color: var(--text);
-}
+  &:hover {
+    color: var(--text);
+  }
 
-.theme-btn.active {
-  background: var(--surface-alt);
-  color: var(--primary);
+  &.active {
+    background: var(--surface-alt);
+    color: var(--primary);
+  }
 }
 
 .intro {
@@ -150,52 +134,22 @@ body {
 }
 
 .panel {
-  /* A tighter, slightly softer palette scoped to the coin list only —
-     matches a reference design given for this component specifically;
-     the rest of the page (header, buttons, spinner) keeps the site's
-     usual tokens. --text-secondary is a third text tone (between --text
-     and --text-muted) this component needs that nothing else on the
-     page uses. */
-  --surface-alt: #f1eee5;
-  --border: #e4e0d4;
-  --text-secondary: #6b7268;
-  --text-muted: #9ba096;
-  --primary: #6b8e63;
-  --primary-strong: #4a6444;
-  --accent-soft: #e6eee2;
-  --positive: #6b8e63;
-  --negative: #c17a5e;
+  /* Intentionally its own, slightly softer palette — not shared with :root. */
+  --surface-alt: light-dark(#f1eee5, #2a2f29);
+  --border: light-dark(#e4e0d4, #343a33);
+  --text-secondary: light-dark(#6b7268, #a6ada1);
+  --text-muted: light-dark(#9ba096, #767c72);
+  --primary: light-dark(#6b8e63, #8fb586);
+  --primary-strong: light-dark(#4a6444, #a9cba1);
+  --accent-soft: light-dark(#e6eee2, #2c3a2a);
+  --positive: light-dark(#6b8e63, #8fb586);
+  --negative: light-dark(#c17a5e, #d79379);
 
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius);
   box-shadow: var(--shadow);
   overflow: hidden;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) .panel {
-    --surface-alt: #2a2f29;
-    --border: #343a33;
-    --text-secondary: #a6ada1;
-    --text-muted: #767c72;
-    --primary: #8fb586;
-    --primary-strong: #a9cba1;
-    --accent-soft: #2c3a2a;
-    --positive: #8fb586;
-    --negative: #d79379;
-  }
-}
-:root[data-theme="dark"] .panel {
-  --surface-alt: #2a2f29;
-  --border: #343a33;
-  --text-secondary: #a6ada1;
-  --text-muted: #767c72;
-  --primary: #8fb586;
-  --primary-strong: #a9cba1;
-  --accent-soft: #2c3a2a;
-  --positive: #8fb586;
-  --negative: #d79379;
 }
 
 .list-meta {
@@ -219,27 +173,21 @@ body {
 }
 
 .info-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
   width: 18px;
   height: 18px;
   padding: 0;
-  border: none;
   border-radius: 50%;
-  background: none;
   color: var(--text-muted);
-  cursor: pointer;
-}
 
-.info-btn:hover,
-.info-btn[aria-expanded="true"] {
-  color: var(--text);
-}
+  &:hover,
+  &[aria-expanded="true"] {
+    color: var(--text);
+  }
 
-.info-btn:focus-visible {
-  outline: 2px solid var(--primary);
-  outline-offset: 2px;
+  &:focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
+  }
 }
 
 .info-popover {
@@ -260,13 +208,6 @@ body {
   text-align: left;
 }
 
-.attribution {
-  display: inline-block;
-  font-size: 0.875rem;
-  color: var(--text-muted);
-  text-decoration: underline;
-}
-
 .retry-btn {
   border: 1px solid var(--border);
   background: var(--surface-alt);
@@ -275,10 +216,10 @@ body {
   padding: 6px 12px;
   font-size: 0.82rem;
   cursor: pointer;
-}
 
-.retry-btn:hover {
-  border-color: var(--secondary);
+  &:hover {
+    border-color: var(--secondary);
+  }
 }
 
 .state-block {
@@ -320,52 +261,57 @@ body {
   table-layout: fixed;
   border-collapse: collapse;
   font-variant-numeric: tabular-nums;
+
+  th,
+  td {
+    padding: 14px 20px;
+    text-align: right;
+    border-bottom: 1px solid var(--border);
+    white-space: nowrap;
+  }
+
+  th {
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--text-muted);
+  }
+
+  td {
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  :is(th, td).col-rank,
+  th.col-coin {
+    text-align: left;
+  }
+
+  tbody tr {
+    &:hover {
+      background: var(--surface-alt);
+    }
+
+    &:last-child td {
+      border-bottom: none;
+    }
+  }
 }
 
-.coin-table th {
-  text-align: right;
-  font-size: 0.72rem;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  color: var(--text-muted);
-  padding: 14px 20px;
-  border-bottom: 1px solid var(--border);
-  white-space: nowrap;
+.col-rank,
+.col-change {
+  font-size: 0.8125rem;
 }
 
-.coin-table th.col-coin {
-  text-align: left;
-}
-
-.coin-table th.col-rank,
-.coin-table td.col-rank {
-  text-align: left;
-}
-
-.coin-table td {
-  padding: 14px 20px;
-  text-align: right;
-  border-bottom: 1px solid var(--border);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.coin-table tbody tr:last-child td {
-  border-bottom: none;
-}
-
-.coin-table tbody tr:hover {
-  background: var(--surface-alt);
+.col-price,
+.col-marketcap,
+.col-volume {
+  font-size: 0.844rem;
 }
 
 .col-rank {
   color: var(--text-muted);
-  font-size: 0.8125rem;
   width: 9%;
-  /* Ranks are always short, plain digits (up to "100") — never truncate
-     them with an ellipsis; the base .coin-table td rule adds that for
-     longer text like coin names, but a clipped number reads as a typo. */
   text-overflow: clip;
 }
 
@@ -376,26 +322,25 @@ body {
 
 .col-price {
   width: 16%;
-  font-size: 0.844rem;
   color: var(--text);
+}
+
+.col-marketcap,
+.col-volume {
+  color: var(--text-secondary);
 }
 
 .col-marketcap {
   width: 16%;
-  font-size: 0.844rem;
-  color: var(--text-secondary);
 }
 
 .col-change {
   width: 13%;
-  font-size: 0.8125rem;
   font-weight: 500;
 }
 
 .col-volume {
   width: 18%;
-  font-size: 0.844rem;
-  color: var(--text-secondary);
 }
 
 .coin-cell {
@@ -456,19 +401,21 @@ body {
   text-align: center;
 }
 
-.site-footer p {
-  margin: 0;
+.attribution,
+.site-footer p,
+.footer-mark-text {
   font-size: 0.875rem;
+}
+
+.attribution {
+  display: inline-block;
   color: var(--text-muted);
+  text-decoration: underline;
 }
 
-.site-footer > *:not(:first-child) {
-  margin-top: 4px;
-  display: block;
-}
-
-.site-footer > p:not(:first-child) {
-  margin-top: 16px;
+.site-footer p {
+  margin: 16px 0 0;
+  color: var(--text-muted);
 }
 
 .footer-link {
@@ -482,14 +429,13 @@ body {
   gap: 6px;
   vertical-align: middle;
   color: var(--text-muted);
-}
 
-.footer-mark svg {
-  display: block;
+  svg {
+    display: block;
+  }
 }
 
 .footer-mark-text {
-  font-size: 0.875rem;
   line-height: 1;
   letter-spacing: -0.01em;
 }
@@ -505,10 +451,6 @@ body {
     display: none;
   }
 
-  /* The column-width percentages are set per breakpoint (rather than
-     relying on table-layout:auto) so the remaining, visible columns
-     always add up to 100% of the wrapper and the table never needs its
-     own horizontal scroll on top of the page's responsive layout. */
   .col-rank {
     width: 12%;
   }
@@ -527,7 +469,7 @@ body {
 
   .coin-table th,
   .coin-table td {
-    padding: 10px 10px;
+    padding: 10px;
   }
 
   .intro h1 {
@@ -557,11 +499,6 @@ body {
     padding: 10px 12px;
   }
 
-  /* Tight breakpoint: give the left-aligned 1-3 digit rank number less
-     room on its inner edge (toward the coin column) than the wider
-     text columns need, while keeping its outer-left padding matched
-     to col-change's outer-right padding so the panel's left and right
-     edges look evenly spaced. */
   .coin-table th.col-rank,
   .coin-table td.col-rank {
     padding-right: 6px;
