@@ -12,6 +12,8 @@
     tableWrapper: document.getElementById("table-wrapper"),
     rows: document.getElementById("coin-rows"),
     updatedAt: document.getElementById("updated-at"),
+    updatedInfoBtn: document.getElementById("updated-info-btn"),
+    updatedInfoPopover: document.getElementById("updated-info-popover"),
     footerHost: document.getElementById("footer-host"),
   };
 
@@ -169,13 +171,24 @@
       return;
     }
     const date = new Date(data.generated_at);
-    const formatted = date.toLocaleString("en-US", {
-      month: "short",
-      day: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-      hour12: false,
-    });
+    const now = new Date();
+    const isToday =
+      date.getFullYear() === now.getFullYear() &&
+      date.getMonth() === now.getMonth() &&
+      date.getDate() === now.getDate();
+    const formatted = isToday
+      ? date.toLocaleString("en-US", {
+          hour: "2-digit",
+          minute: "2-digit",
+          hour12: false,
+        })
+      : date.toLocaleString("en-US", {
+          month: "short",
+          day: "numeric",
+          hour: "2-digit",
+          minute: "2-digit",
+          hour12: false,
+        });
     els.updatedAt.textContent = "Updated " + formatted;
   }
 
@@ -213,9 +226,41 @@
     });
   }
 
+  // ---------- Updated-info popover ----------
+
+  function setInfoPopoverOpen(open) {
+    els.updatedInfoBtn.setAttribute("aria-expanded", String(open));
+    els.updatedInfoPopover.hidden = !open;
+  }
+
+  function initInfoPopover() {
+    els.updatedInfoBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      setInfoPopoverOpen(els.updatedInfoPopover.hidden);
+    });
+
+    document.addEventListener("click", (e) => {
+      if (
+        !els.updatedInfoPopover.hidden &&
+        !els.updatedInfoBtn.contains(e.target) &&
+        !els.updatedInfoPopover.contains(e.target)
+      ) {
+        setInfoPopoverOpen(false);
+      }
+    });
+
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && !els.updatedInfoPopover.hidden) {
+        setInfoPopoverOpen(false);
+        els.updatedInfoBtn.focus();
+      }
+    });
+  }
+
   function init() {
     initTheme();
     initRetry();
+    initInfoPopover();
     els.footerHost.textContent = window.location.hostname;
     loadCoins();
   }

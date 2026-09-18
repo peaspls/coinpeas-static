@@ -64,8 +64,26 @@
       </section>
 
       <div id="list-meta" class="list-meta" hidden>
-        <span id="updated-at" class="updated-at"></span>
-        <span class="update-interval">· every ~15 min</span>
+        <div class="updated-row">
+          <span id="updated-at" class="updated-at"></span>
+          <button
+            id="updated-info-btn"
+            class="info-btn"
+            type="button"
+            aria-expanded="false"
+            aria-controls="updated-info-popover"
+            aria-label="Refresh schedule info"
+          >
+            <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true" focusable="false">
+              <circle cx="8" cy="8" r="7" fill="none" stroke="currentColor" stroke-width="1.4"></circle>
+              <line x1="8" y1="7" x2="8" y2="11.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"></line>
+              <circle cx="8" cy="4.6" r="0.9" fill="currentColor"></circle>
+            </svg>
+          </button>
+          <div id="updated-info-popover" class="info-popover" role="tooltip" hidden>
+            Refreshes on the hour and every 15 min after.
+          </div>
+        </div>
       </div>
 
       <section class="panel" aria-live="polite">
@@ -97,19 +115,22 @@
       </section>
 
       <footer class="site-footer">
-        <a class="attribution" href="https://www.coingecko.com/en/api/" target="_blank" rel="noopener">Powered by CoinGecko</a>
-        <span class="footer-mark">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-            <path d="M2 16.7c1.2-6.4 6.8-9.4 20-9.4 -1.2 6.4-6.8 9.4-20 9.4Z" fill="currentColor" opacity="0.15"/>
-            <path d="M2 16.7c1.2-6.4 6.8-9.4 20-9.4 -1.2 6.4-6.8 9.4-20 9.4Z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/>
-            <circle cx="7.6" cy="15.3" r="1.5" fill="currentColor"/>
-            <circle cx="12" cy="13.6" r="1.5" fill="currentColor"/>
-            <circle cx="16.4" cy="11.9" r="1.5" fill="currentColor"/>
-          </svg>
-          <span class="footer-mark-text" id="footer-host"></span>
-        </span>
-        <p>For informational purposes only.</p>
-        <p>By peaspls, for every creature that shares this world — <a class="footer-link" href="https://github.com/peaspls/coinpeas-static" target="_blank" rel="noopener">view source on GitHub</a>.</p>
+        <a class="attribution" href="https://www.coingecko.com/en/api/" target="_blank" rel="noopener">Powered by CoinGecko API</a>
+        <p>
+          <span class="footer-mark">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <path d="M2 16.7c1.2-6.4 6.8-9.4 20-9.4 -1.2 6.4-6.8 9.4-20 9.4Z" fill="currentColor" opacity="0.15"/>
+              <path d="M2 16.7c1.2-6.4 6.8-9.4 20-9.4 -1.2 6.4-6.8 9.4-20 9.4Z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/>
+              <circle cx="7.6" cy="15.3" r="1.5" fill="currentColor"/>
+              <circle cx="12" cy="13.6" r="1.5" fill="currentColor"/>
+              <circle cx="16.4" cy="11.9" r="1.5" fill="currentColor"/>
+            </svg>
+            <span class="footer-mark-text" id="footer-host"></span>
+          </span>
+          <br />
+          For informational purposes only.<br />
+          By peaspls, for every creature that shares this world — <a class="footer-link" href="https://github.com/peaspls/coinpeas-static" target="_blank" rel="noopener">view source on GitHub</a>.
+        </p>
       </footer>
     </main>
   </div>
