@@ -13,20 +13,20 @@ jobs:
   update:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
-          node-version: 22
+          node-version-file: .nvmrc
           cache: npm
 
       # dist/ only needs rebuilding when the app itself changes, not
       # when coins.json changes (that happens on almost every run).
       - id: dist-cache
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: dist
-          key: dist-${{ hashFiles('index.html', 'src/**', 'public/_headers', 'public/_redirects', 'package-lock.json') }}
+          key: dist-${{ hashFiles('index.html', 'src/**', 'public/_headers', 'package-lock.json') }}
 
       - if: steps.dist-cache.outputs.cache-hit != 'true'
         run: npm ci
@@ -34,7 +34,13 @@ jobs:
       - if: steps.dist-cache.outputs.cache-hit != 'true'
         run: npm run build
 
-      - run: npm run fetch-coins
+      - run: |
+          if [ -n "$COINGECKO_API_KEY" ]; then
+            echo "Using COINGECKO_API_KEY for this request."
+          else
+            echo "No COINGECKO_API_KEY set — using CoinGecko's public rate limits."
+          fi
+          npm run fetch-coins
         env:
           COINGECKO_API_KEY: ${{ secrets.COINGECKO_API_KEY }}
 
@@ -50,3 +56,8 @@ jobs:
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           command: deploy --config wrangler.jsonc
           wranglerVersion: "4.132.0"
+
+      - if: vars.DEPLOY_ENABLED != 'true'
+        run: |
+          echo "::notice title=Deploy skipped::DEPLOY_ENABLED is not set to 'true' — the Cloudflare deploy step was skipped this run."
+          echo "⚠️ Deploy skipped — \`DEPLOY_ENABLED\` repo variable is not set to \`true\`." >> "$GITHUB_STEP_SUMMARY"
