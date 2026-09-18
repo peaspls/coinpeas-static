@@ -4,13 +4,6 @@ A small serverless cryptocurrency website hosted entirely on Cloudflare.
 
 The public website is **100% static**. `coins.json` is a static asset like everything else, so normal visitors never invoke Worker code — Cloudflare serves static asset requests directly from the edge, for free, regardless of traffic volume.
 
-Public URLs:
-
-```text
-https://coinpeas.com/
-https://coinpeas.com/coins.json
-```
-
 ## Architecture
 
 ```text
@@ -20,11 +13,11 @@ https://coinpeas.com/coins.json
                              │
                              ▼
                   ┌───────────────────────┐
-                  │ GitHub Actions         │
-                  │ scheduled workflow     │
-                  │ (fetch → deploy;       │
-                  │  build only on a       │
-                  │  dist cache miss)      │
+                  │ GitHub Actions        │
+                  │ scheduled workflow    │
+                  │ (fetch → deploy;      │
+                  │  build only on a      │
+                  │  dist cache miss)     │
                   └───────────┬───────────┘
                               │
                               ▼
@@ -52,22 +45,18 @@ npm install
 
 ### Hostname
 
-Both the apex and `www` are bound as custom domains in `wrangler.jsonc`, so Cloudflare provisions DNS/TLS for each and routes both to this Worker:
+The apex domain is bound as a custom domain in `wrangler.jsonc`, so Cloudflare provisions DNS/TLS for it and routes it to this Worker:
 
 ```json
 "routes": [
   {
     "pattern": "coinpeas.com",
     "custom_domain": true
-  },
-  {
-    "pattern": "www.coinpeas.com",
-    "custom_domain": true
   }
 ]
 ```
 
-`public/_redirects` then 301-redirects `www.coinpeas.com/*` to `https://coinpeas.com/:splat`.
+This route is currently commented out in `wrangler.jsonc` until `coinpeas.com` is actually registered and added as a Cloudflare zone — until then, deploys publish to the free `coinpeas.<account-subdomain>.workers.dev` instead.
 
 ### GitHub Actions secrets and variables
 

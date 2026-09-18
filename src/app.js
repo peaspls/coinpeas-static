@@ -12,6 +12,7 @@
     tableWrapper: document.getElementById("table-wrapper"),
     rows: document.getElementById("coin-rows"),
     updatedAt: document.getElementById("updated-at"),
+    footerHost: document.getElementById("footer-host"),
   };
 
   // ---------- Theme ----------
@@ -215,6 +216,7 @@
   function init() {
     initTheme();
     initRetry();
+    els.footerHost.textContent = window.location.hostname;
     loadCoins();
   }
 
