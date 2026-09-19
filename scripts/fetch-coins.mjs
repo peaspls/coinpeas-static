@@ -1,8 +1,10 @@
 // Fetches the top 100 coins by market cap from CoinGecko and writes them to
-// the path given as the first CLI arg (e.g. `dist/coins.json` — see
-// `npm run deploy` and .github/workflows/update-coins.yml). No default path:
-// local dev intentionally renders the static public/coins.json fixture as-is
-// and should never fetch live data as a side effect of some other command.
+// the path given as the first CLI arg — see
+// `npm run deploy` and .github/workflows/update-coins.yml). This must run
+// *before* `vite build`, since app.js imports coins.json and Vite bakes its
+// contents into a hashed chunk at build time. No default path: local dev
+// intentionally renders the static src/coins.json fixture as-is and should
+// never fetch live data as a side effect of some other command.
 import { writeFile, rename } from "node:fs/promises";
 import path from "node:path";
 

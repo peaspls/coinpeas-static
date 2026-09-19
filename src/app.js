@@ -2,7 +2,6 @@
 (function () {
   "use strict";
 
-  const COINS_URL = "/coins.json";
   const THEME_STORAGE_KEY = "coinpeas-theme";
 
   const els = {
@@ -194,20 +193,16 @@
 
   // ---------- Data loading ----------
   //
-  // coins.json is a static file refreshed periodically by a build-time
-  // script, not a live API, so this only fetches once per page load.
-  // no-cache forces a revalidation request (cheap 304 if unchanged) instead
-  // of trusting the browser's cached copy for the full Cache-Control max-age.
+  // coins.json is refreshed by a build-time script and rebuilt into its own
+  // hashed chunk on every data refresh (see scripts/fetch-coins.mjs), so a
+  // dynamic import always resolves to whatever was current at build time —
+  // no runtime fetch or cache-control dance needed.
 
   async function loadCoins() {
     showLoading();
 
     try {
-      const response = await fetch(COINS_URL, { cache: "no-cache" });
-      if (!response.ok) {
-        throw new Error("HTTP " + response.status);
-      }
-      const data = await response.json();
+      const { default: data } = await import("./coins.json");
       if (!Array.isArray(data?.coins)) {
         throw new Error("Invalid coins.json");
       }

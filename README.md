@@ -2,7 +2,7 @@
 
 A small serverless cryptocurrency website hosted entirely on Cloudflare.
 
-The public website is **100% static**. `coins.json` is a static asset like everything else, so normal visitors never invoke Worker code — Cloudflare serves static asset requests directly from the edge, for free, regardless of traffic volume.
+The public website is **100% static**. Every asset, including the coin data, is a content-hashed file produced by the Vite build, so normal visitors never invoke Worker code — Cloudflare serves static asset requests directly from the edge, for free, regardless of traffic volume.
 
 ## Architecture
 
@@ -15,9 +15,8 @@ The public website is **100% static**. `coins.json` is a static asset like every
                   ┌───────────────────────┐
                   │ GitHub Actions        │
                   │ scheduled workflow    │
-                  │ (fetch → deploy;      │
-                  │  build only on a      │
-                  │  dist cache miss)     │
+                  │ (fetch → build →      │
+                  │  deploy, every run)   │
                   └───────────┬───────────┘
                               │
                               ▼
@@ -25,7 +24,7 @@ The public website is **100% static**. `coins.json` is a static asset like every
                               │
                ┌──────────────┼──────────────┐
                ▼              ▼              ▼
-          index.html     assets/*.js     coins.json
+          index.html    assets/index-*.js  assets/coins-*.js
                │              │              │
                └──────────────┴──────────────┘
                               │
@@ -34,6 +33,8 @@ The public website is **100% static**. `coins.json` is a static asset like every
 ```
 
 `coinpeas` is an assets-only Worker (no `main` script) — it just serves static assets, so there's no application code on the read path. All data refreshing happens outside Cloudflare, in a GitHub Actions cron workflow that fetches fresh coin data and redeploys on a schedule (see [Cron schedule](#cron-schedule)). `wrangler deploy` computes the static asset manifest itself — no hand-rolled Cloudflare API calls or asset-hash bookkeeping.
+
+`src/coins.json` is imported from `src/app.js` with a dynamic `import()` rather than fetched over HTTP. Vite bundles it into its own content-hashed chunk (`assets/coins-*.js`), separate from the app code chunk — so app.js's own hash (and its browser cache entry) doesn't change just because the coin data did, and the coin data chunk can be cached immutably forever since a new deploy always gives it a new URL.
 
 ## Setup
 
@@ -86,12 +87,9 @@ Once all three secrets and the `DEPLOY_ENABLED` variable are set, the next sched
 On each scheduled run, `.github/workflows/update-coins.yml`:
 
 1. Checks out the repo.
-2. Restores `dist/` from a cache keyed on the app source — **not** on `coins.json`, which changes on almost every run.
-3. On a cache miss only (app code actually changed, or the cache expired): `npm ci` + `npm run build` (Vite) to rebuild `dist/` from scratch.
-4. `npm run fetch-coins` — fetches the top 100 coins from CoinGecko (with a timeout and retries) and writes them straight into `dist/coins.json`, trimmed to just the fields the frontend renders. This never touches the git-tracked `public/coins.json`, which exists only as a fixture for local dev.
-5. `wrangler deploy` (pinned to a fixed Wrangler version, so it works even when `npm ci` was skipped) uploads `dist/` as a new `coinpeas` version.
-
-On the common path (cache hit), step 3 is skipped — most runs just fetch data and deploy.
+2. `npm run fetch-coins` — fetches the top 100 coins from CoinGecko (with a timeout and retries) and overwrites `src/coins.json`, trimmed to just the fields the frontend renders. This runs *before* the build, since `src/app.js` imports `src/coins.json` and Vite needs the fresh data to bake into the build's hashed chunk.
+3. `npm ci` + `npm run build` (Vite) — rebuilds `dist/` from scratch. This runs on every scheduled run now, since coin data changes (and therefore the build output) on almost every run — there's no longer a data-only update path that can skip straight to deploy.
+4. `wrangler deploy` uploads `dist/` as a new `coinpeas` version.
 
 You can also run this same sequence manually at any time with `npm run deploy`, e.g. to push a code change immediately without waiting for the next scheduled run.
 
@@ -112,16 +110,14 @@ On a public repository, GitHub Actions minutes are unlimited and free. On a priv
 
 ## Static asset caching
 
-`public/_headers` caps how long any cache (browser, Cloudflare edge, or a proxy in between) may serve a stale copy of the mutable JSON:
+`public/_headers` marks everything under `assets/*` as immutable and cacheable for a year:
 
 ```text
-/coins.json
-  Cache-Control: public, max-age=60
+/assets/*
+  Cache-Control: public, max-age=31536000, immutable
 ```
 
-The frontend's own `fetch` already uses `cache: "no-cache"`, so on every page load the browser revalidates with the server anyway (a cheap `304` if nothing changed) rather than trusting its own cached copy. `max-age=60` instead bounds a *different* client's worst case: without it, a stale edge/proxy copy could combine with the gap between deploys to serve data up to roughly double that deploy interval's worth of staleness; capping it at 60 seconds instead keeps the worst case close to just the deploy interval plus one minute.
-
-Frontend assets generated by Vite can use long-lived caching because their filenames contain content hashes. `coins.json` itself never changes URL — each update just publishes a new static version containing the new contents.
+This is safe because every file in `assets/` — including the coin data chunk — has a content hash in its filename. A stale cached copy is never served, because a change in content always means a new URL; `index.html` (not covered by this rule, so it's revalidated normally) is what points visitors at the current hashes after each deploy.
 
 ## Cost/scaling model
 
@@ -135,8 +131,8 @@ Run the Vite development server:
 npm run dev
 ```
 
-This renders the static `public/coins.json` fixture as-is — dev intentionally never fetches live data, so it stays fast and deterministic regardless of CoinGecko's availability or rate limits. `npm run fetch-coins` is reserved for deploys and always targets `dist/coins.json`; to deliberately refresh the fixture itself with a newer real snapshot (e.g. after changing which fields `fetch-coins.mjs` keeps), call the script directly with a different path:
+This renders the static `src/coins.json` fixture as-is — dev intentionally never fetches live data, so it stays fast and deterministic regardless of CoinGecko's availability or rate limits. `npm run fetch-coins` is reserved for deploys and always targets `src/coins.json`; running it locally would overwrite the git-tracked fixture, so only do that deliberately (e.g. after changing which fields `fetch-coins.mjs` keeps) and review the diff before committing:
 
 ```bash
-node scripts/fetch-coins.mjs public/coins.json
+npm run fetch-coins
 ```

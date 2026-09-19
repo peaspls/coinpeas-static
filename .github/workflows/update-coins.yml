@@ -1,39 +1,65 @@
 name: Update coin data
 
+# When this workflow runs.
 on:
+  # Runs automatically on a recurring schedule, defined in cron syntax
+  # ("*/15 * * * *" = every 15 minutes, in UTC). See the Cron schedule
+  # section in README.md for more on this.
   schedule:
     - cron: "*/15 * * * *"
+  # Also allows triggering it by hand from the GitHub UI
+  # (Actions -> Update coin data -> Run workflow), or via the API/gh CLI.
   workflow_dispatch: {}
 
+# If a run is still going when the next scheduled run fires (e.g. this run
+# is slow, or someone triggers it manually), queue the new one instead of
+# running both at once — two runs deploying at the same time could race.
 concurrency:
   group: update-coins
   cancel-in-progress: false
 
+# The actual work. A workflow can have multiple jobs (each gets its own
+# fresh VM and can run in parallel); this workflow only needs one.
 jobs:
   update:
+    # The VM image this job runs on — a clean, temporary Ubuntu machine.
     runs-on: ubuntu-latest
+    # The ordered list of commands/actions that make up this job. Each
+    # `- uses:` runs a prebuilt action (someone else's packaged script);
+    # each `- run:` runs a shell command directly.
     steps:
+      # Clones this repo's code onto the VM. Every step after this one
+      # needs the repo's files (package.json, src/, etc.) to exist on
+      # disk, so this always has to come first.
       - uses: actions/checkout@v7
 
+      # Installs Node.js on the VM, using the version pinned in .nvmrc.
+      # `cache: npm` also caches npm's own download cache (~/.npm) between
+      # runs, so the "npm ci" step below (when it does run) doesn't have
+      # to re-download every package from the registry each time.
       - uses: actions/setup-node@v7
         with:
           node-version-file: .nvmrc
           cache: npm
 
-      # dist/ only needs rebuilding when the app itself changes, not
-      # when coins.json changes (that happens on almost every run).
-      - id: dist-cache
+      # Caches the node_modules folder itself between runs, keyed on the
+      # contents of package-lock.json. If the lockfile hasn't changed
+      # since the last run, `cache-hit` comes back "true" and the `npm ci`
+      # step further down is skipped entirely — most runs don't need to
+      # reinstall vite/wrangler/etc. from scratch.
+      # No restore-keys (which would allow a "close enough" partial match):
+      # node_modules must exactly match the current lockfile, or skipping
+      # npm ci would leave stale/wrong packages installed.
+      - id: node-modules-cache
         uses: actions/cache@v6
         with:
-          path: dist
-          key: dist-${{ hashFiles('index.html', 'src/**', 'public/_headers', 'package-lock.json') }}
+          path: node_modules
+          key: node-modules-${{ hashFiles('package-lock.json') }}
 
-      - if: steps.dist-cache.outputs.cache-hit != 'true'
-        run: npm ci
-
-      - if: steps.dist-cache.outputs.cache-hit != 'true'
-        run: npm run build
-
+      # Runs before `npm ci`/the build: app.js imports coins.json and Vite
+      # bakes its contents into a hashed chunk, so fresh data must land in
+      # src/coins.json before the build runs, not after. No npm dependencies
+      # needed for this script itself, so it's safe to run this early.
       - run: |
           if [ -n "$COINGECKO_API_KEY" ]; then
             echo "Using COINGECKO_API_KEY for this request."
@@ -51,8 +77,23 @@ jobs:
             exit $status
           fi
         env:
+          # Makes the COINGECKO_API_KEY repo secret available to the shell
+          # script above as an environment variable of the same name.
           COINGECKO_API_KEY: ${{ secrets.COINGECKO_API_KEY }}
 
+      # `if:` makes a step conditional — it only runs when the expression
+      # is true. Here, only install dependencies when the node_modules
+      # cache above missed (i.e. package-lock.json changed since last time).
+      - if: steps.node-modules-cache.outputs.cache-hit != 'true'
+        run: npm ci
+
+      # coins.json now lives in src/ and gets bundled+hashed by Vite, so
+      # every run needs a real rebuild.
+      - run: npm run build
+
+      # Deploys dist/ to Cloudflare using the pinned Wrangler version below
+      # (wrangler-action installs its own copy of Wrangler for this, so it
+      # works even on runs where the `npm ci` step above was skipped).
       # Skipped until the CLOUDFLARE_API_TOKEN/CLOUDFLARE_ACCOUNT_ID secrets
       # are set up — set the DEPLOY_ENABLED repo variable to "true" once
       # they're in place. Without this, every scheduled run would fail at
@@ -64,13 +105,18 @@ jobs:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           command: "deploy --config wrangler.jsonc --message \"GitHub Actions (${{ github.event_name == 'schedule' && 'scheduled' || 'manually triggered' }}) deploy — run #${{ github.run_number }}\""
-          wranglerVersion: "4.132.0"
+          wranglerVersion: "4.135.0"
 
+      # Logs a success message — shown as a GitHub Actions "notice"
+      # annotation, and also appended to the run's step summary page.
       - if: vars.DEPLOY_ENABLED == 'true'
         run: |
           echo "::notice title=Deploy succeeded::coinpeas was deployed to Cloudflare."
           echo "✅ Deployed to Cloudflare." >> "$GITHUB_STEP_SUMMARY"
 
+      # The inverse of the deploy step's condition above — logs that the
+      # deploy was skipped, so a run isn't silently missing that step with
+      # no explanation in the logs.
       - if: vars.DEPLOY_ENABLED != 'true'
         run: |
           echo "::notice title=Deploy skipped::DEPLOY_ENABLED is not set to 'true' — the Cloudflare deploy step was skipped this run."
