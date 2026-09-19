@@ -425,12 +425,37 @@ body {
   letter-spacing: -0.01em;
 }
 
+@media (max-width: 767px) {
+  .col-volume {
+    display: none;
+  }
+
+  .col-rank {
+    width: 10%;
+  }
+
+  .col-coin {
+    width: 33%;
+  }
+
+  .col-price {
+    width: 19%;
+  }
+
+  .col-change {
+    width: 15%;
+  }
+
+  .col-marketcap {
+    width: 23%;
+  }
+}
+
 @media (max-width: 640px) {
   .page {
     padding: 20px 14px 40px;
   }
 
-  .col-volume,
   .col-marketcap {
     display: none;
   }
@@ -486,5 +511,23 @@ body {
   .coin-table th.col-rank,
   .coin-table td.col-rank {
     padding-right: 6px;
+  }
+}
+
+@media (max-width: 380px) {
+  .col-rank {
+    display: none;
+  }
+
+  .col-coin {
+    width: 40%;
+  }
+
+  .col-price {
+    width: 30%;
+  }
+
+  .col-change {
+    width: 30%;
   }
 }
