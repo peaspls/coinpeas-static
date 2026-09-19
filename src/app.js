@@ -225,6 +225,22 @@
 
   // ---------- Rendering ----------
 
+  // coins.json stores columns (one array per field) rather than one object
+  // per coin, so field names aren't repeated 100 times over — reassemble
+  // rows here, where it only costs a lookup per coin per page load rather
+  // than a repeated field name per coin in the transferred file.
+  function toCoinObjects(columns) {
+    const fields = Object.keys(columns);
+    const count = columns[fields[0]]?.length ?? 0;
+    const rows = new Array(count);
+    for (let i = 0; i < count; i++) {
+      const row = {};
+      for (const field of fields) row[field] = columns[field][i];
+      rows[i] = row;
+    }
+    return rows;
+  }
+
   function renderRows(coins) {
     const html = coins.map((coin) => {
       const changeClass =
@@ -318,10 +334,10 @@
 
     try {
       const { default: data } = await import("./coins.json");
-      if (!Array.isArray(data?.coins)) {
+      if (typeof data?.coins !== "object" || !Array.isArray(data?.coins?.name)) {
         throw new Error("Invalid coins.json");
       }
-      renderRows(data.coins);
+      renderRows(toCoinObjects(data.coins));
       updateCacheMeta(data);
       showTable();
     } catch (err) {

@@ -1,5 +1,5 @@
 // Fetches the top 100 coins by market cap from CoinGecko and writes them to
-// the path given as the first CLI arg — see
+// the path given as the first CLI arg (e.g. `src/coins.json` — see
 // `npm run deploy` and .github/workflows/update-coins.yml). This must run
 // *before* `vite build`, since app.js imports coins.json and Vite bakes its
 // contents into a hashed chunk at build time. No default path: local dev
@@ -22,6 +22,19 @@ const OUTPUT_PATH = path.resolve(process.argv[2]);
 const REQUEST_TIMEOUT_MS = 15_000;
 const MAX_ATTEMPTS = 3;
 const RETRY_DELAY_MS = 2_000;
+
+// The fields kept per coin, written out columnar (see below) so each name
+// appears once in the output file, not once per coin.
+const FIELDS = [
+  "market_cap_rank",
+  "name",
+  "symbol",
+  "current_price",
+  "price_change_percentage_24h",
+  "market_cap",
+  "total_volume",
+  "last_updated",
+];
 
 const headers = {};
 if (process.env.COINGECKO_API_KEY) {
@@ -57,16 +70,12 @@ async function fetchCoins() {
       // price can be older than this script's generated_at) — CoinGecko's
       // raw objects carry ~25 fields (ath, atl, supply figures, roi, ...)
       // that would otherwise be downloaded by every visitor for no reason.
-      return coins.map((coin) => ({
-        market_cap_rank: coin.market_cap_rank,
-        name: coin.name,
-        symbol: coin.symbol,
-        current_price: coin.current_price,
-        price_change_percentage_24h: coin.price_change_percentage_24h,
-        market_cap: coin.market_cap,
-        total_volume: coin.total_volume,
-        last_updated: coin.last_updated,
-      }));
+      // Written columnar (one array per field, see FIELDS above) rather than
+      // one object per coin: grouping same-typed values together compresses
+      // better than interleaving them row by row.
+      return Object.fromEntries(
+        FIELDS.map((field) => [field, coins.map((coin) => coin[field])])
+      );
     } catch (error) {
       // Retry on any failure (network error, timeout, bad status, malformed
       // body) rather than special-casing which ones are "retryable" — at
@@ -79,6 +88,7 @@ async function fetchCoins() {
 }
 
 const coins = await fetchCoins();
+const coinCount = coins[FIELDS[0]].length;
 
 const output = {
   source: "CoinGecko",
@@ -91,4 +101,4 @@ const tmpPath = `${OUTPUT_PATH}.tmp`;
 await writeFile(tmpPath, JSON.stringify(output));
 await rename(tmpPath, OUTPUT_PATH);
 
-console.log(`Wrote ${coins.length} coins to ${OUTPUT_PATH}`);
+console.log(`Wrote ${coinCount} coins to ${OUTPUT_PATH}`);
