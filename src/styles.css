@@ -351,21 +351,6 @@ body {
   text-align: left;
 }
 
-.coin-avatar {
-  width: 30px;
-  height: 30px;
-  border-radius: 50%;
-  background: var(--accent-soft);
-  color: var(--primary-strong);
-  flex: none;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 0.75rem;
-  font-weight: 600;
-  line-height: 1;
-}
-
 .coin-label {
   min-width: 0;
   overflow: hidden;
@@ -446,8 +431,7 @@ body {
   }
 
   .col-volume,
-  .col-marketcap,
-  .coin-avatar {
+  .col-marketcap {
     display: none;
   }
 

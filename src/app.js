@@ -249,15 +249,11 @@
           : coin.price_change_percentage_24h < 0
           ? "change-negative"
           : "";
-      const initial = escapeHTML((coin.name || coin.symbol || "?").trim().charAt(0).toUpperCase());
-      const avatar = `<span class="coin-avatar" aria-hidden="true">${initial}</span>`;
-
       return `
         <tr>
           <td class="col-rank">${coin.market_cap_rank ?? "—"}</td>
           <td class="col-coin">
             <div class="coin-cell">
-              ${avatar}
               <span class="coin-label">
                 <span class="coin-name" title="${escapeHTML(coin.name)}">${escapeHTML(coin.name)}</span>
                 <span class="coin-symbol" title="${escapeHTML(coin.symbol)}">${escapeHTML(coin.symbol)}</span>
