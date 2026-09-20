@@ -58,7 +58,7 @@ function renderShell() {
               ${INFO_ICON}
             </button>
             <div id="updated-info-popover" class="info-popover" role="tooltip" hidden>
-              Refreshes on the hour and every 15 min after.
+              Data updates on the hour and every 15 min after. Reload the page to see the latest.
             </div>
           </div>
         </div>
@@ -94,8 +94,9 @@ function renderShell() {
               <span class="footer-mark-text" id="footer-host"></span>
             </span>
             <br />
-            For informational purposes only.<br />
-            By peaspls, for every creature that shares this world — <a class="footer-link" href="https://github.com/peaspls/coinpeas-static" target="_blank" rel="noopener">view source on GitHub</a>.
+            Not financial advice — crypto is volatile, so always do your own research.
+            CoinPeas isn't liable for decisions made using this data.<br />
+            A small project by <a class="footer-link" href="https://github.com/peaspls" target="_blank" rel="noopener">peaspls</a>, for every creature that shares this world — <a class="footer-link" href="https://github.com/peaspls/coinpeas-static" target="_blank" rel="noopener">view source on GitHub</a>.
           </p>
         </footer>
       </main>
