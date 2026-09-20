@@ -63,12 +63,7 @@ function renderShell() {
           </div>
         </div>
 
-        <section class="panel" aria-live="polite">
-          <div id="loading-state" class="state-block">
-            <div class="pea-spinner" aria-hidden="true"></div>
-            <p>Growing your dashboard&hellip;</p>
-          </div>
-
+        <section id="panel" class="panel" aria-live="polite" hidden>
           <div id="error-state" class="state-block" hidden>
             <p>We couldn't reach the market data right now.</p>
             <button class="retry-btn retry-btn-inline" type="button" data-retry>Try again</button>
@@ -91,7 +86,7 @@ function renderShell() {
           </div>
         </section>
 
-        <footer class="site-footer">
+        <footer id="site-footer" class="site-footer" hidden>
           <a class="attribution" href="https://www.coingecko.com/en/api/" target="_blank" rel="noopener">Powered by CoinGecko API</a>
           <p>
             <span class="footer-mark">
@@ -108,7 +103,7 @@ function renderShell() {
 }
 
 const ELEMENT_IDS = {
-  loading: "loading-state",
+  panel: "panel",
   error: "error-state",
   listMeta: "list-meta",
   tableWrapper: "table-wrapper",
@@ -116,6 +111,7 @@ const ELEMENT_IDS = {
   updatedAt: "updated-at",
   updatedInfoBtn: "updated-info-btn",
   updatedInfoPopover: "updated-info-popover",
+  footer: "site-footer",
   footerHost: "footer-host",
 };
 
@@ -263,9 +259,13 @@ function renderRows(coins) {
   els.rows.innerHTML = html;
 }
 
-// The panel is always in exactly one of these three states.
+// The panel and footer stay out of the layout entirely until the data
+// request settles, then appear already in their final state — revealing an
+// element that was never rendered before doesn't count as a layout shift,
+// where swapping a visible loading skeleton for the real content would.
 function setViewState(state) {
-  els.loading.hidden = state !== "loading";
+  els.panel.hidden = false;
+  els.footer.hidden = false;
   els.error.hidden = state !== "error";
   els.listMeta.hidden = state !== "table";
   els.tableWrapper.hidden = state !== "table";
@@ -298,8 +298,6 @@ function updateCacheMeta(data) {
 // no runtime fetch or cache-control dance needed.
 
 async function loadCoins() {
-  setViewState("loading");
-
   try {
     const { default: data } = await import("./coins.json");
     // A columnar coins.json always has a "name" column; checking for it

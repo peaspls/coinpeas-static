@@ -53,6 +53,13 @@
   box-sizing: border-box;
 }
 
+html {
+  /* Reserves the scrollbar's width up front, so the page going from
+     short (no scrollbar) to tall (scrollbar) doesn't nudge the
+     horizontally-centered .page over by the scrollbar's width. */
+  scrollbar-gutter: stable;
+}
+
 body {
   margin: 0;
   background: var(--bg);
@@ -252,22 +259,6 @@ body {
 
 .retry-btn-inline {
   margin-top: 14px;
-}
-
-.pea-spinner {
-  width: 34px;
-  height: 34px;
-  margin: 0 auto;
-  border-radius: 50%;
-  border: 3px solid var(--border);
-  border-top-color: var(--primary);
-  animation: spin 0.9s linear infinite;
-}
-
-@keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
 }
 
 .table-wrapper {
