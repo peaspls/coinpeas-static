@@ -292,14 +292,14 @@ function updateCacheMeta(data) {
 }
 
 // ---------- Data loading ----------
-// coins.json is refreshed by a build-time script and rebuilt into its own
-// hashed chunk on every data refresh (see scripts/fetch-coins.mjs), so a
-// dynamic import always resolves to whatever was current at build time —
-// no runtime fetch or cache-control dance needed.
+// coins.json is refreshed by a build-time script (see scripts/fetch-coins.mjs)
+// and inlined into index.html as window.__COINS__ by vite.config.js's
+// transformIndexHtml plugin, so it's already on the page by the time this
+// runs — no import, fetch, or cache-control dance needed.
 
-async function loadCoins() {
+function loadCoins() {
   try {
-    const { default: data } = await import("./coins.json");
+    const data = window.__COINS__;
     // A columnar coins.json always has a "name" column; checking for it
     // also confirms `data.coins` itself is present and the right shape.
     if (!Array.isArray(data?.coins?.name)) {

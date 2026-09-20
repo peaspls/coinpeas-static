@@ -56,10 +56,10 @@ jobs:
           path: node_modules
           key: node-modules-${{ hashFiles('package-lock.json') }}
 
-      # Runs before `npm ci`/the build: app.js imports coins.json and Vite
-      # bakes its contents into a hashed chunk, so fresh data must land in
-      # src/coins.json before the build runs, not after. No npm dependencies
-      # needed for this script itself, so it's safe to run this early.
+      # Runs before `npm ci`/the build: Vite inlines coins.json straight into
+      # index.html at build time, so fresh data must land in src/coins.json
+      # before the build runs, not after. No npm dependencies needed for this
+      # script itself, so it's safe to run this early.
       - run: |
           if [ -n "$COINGECKO_API_KEY" ]; then
             echo "Using COINGECKO_API_KEY for this request."
@@ -87,8 +87,8 @@ jobs:
       - if: steps.node-modules-cache.outputs.cache-hit != 'true'
         run: npm ci
 
-      # coins.json now lives in src/ and gets bundled+hashed by Vite, so
-      # every run needs a real rebuild.
+      # coins.json is inlined into index.html at build time, so every run
+      # needs a real rebuild to pick up the fresh data.
       - run: npm run build
 
       # Deploys dist/ to Cloudflare using the pinned Wrangler version below
