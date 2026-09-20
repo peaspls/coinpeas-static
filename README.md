@@ -2,7 +2,7 @@
 
 A small serverless cryptocurrency website hosted entirely on Cloudflare.
 
-The public website is **100% static**. Every asset is a content-hashed file produced by the Vite build, so normal visitors never invoke Worker code — Cloudflare serves static asset requests directly from the edge, for free, regardless of traffic volume.
+The public website is **100% static** — Cloudflare serves every request directly from the edge as a static asset, so normal visitors never invoke Worker code, for free, regardless of traffic volume.
 
 ## Architecture
 
@@ -24,7 +24,9 @@ The public website is **100% static**. Every asset is a content-hashed file prod
                               │
                ┌──────────────┼──────────────┐
                ▼              ▼              ▼
-          index.html    assets/index-*.js  assets/coins-*.js
+          index.html      assets/*        fonts/*
+      (coin data inlined) (JS, CSS,      (self-hosted
+                            favicon)         Inter)
                │              │              │
                └──────────────┴──────────────┘
                               │
@@ -110,14 +112,17 @@ On a public repository, GitHub Actions minutes are unlimited and free. On a priv
 
 ## Static asset caching
 
-`public/_headers` marks everything under `assets/*` as immutable and cacheable for a year:
+`public/_headers` marks `assets/*` and `fonts/*` as immutable and cacheable for a year:
 
 ```text
 /assets/*
   Cache-Control: public, max-age=31536000, immutable
+
+/fonts/*
+  Cache-Control: public, max-age=31536000, immutable
 ```
 
-This is safe because every file in `assets/` has a content hash in its filename. A stale cached copy is never served, because a change in content always means a new URL; `index.html` (not covered by this rule, so it's revalidated normally) is what points visitors at the current hashes — and the current coin data — after each deploy.
+`assets/*` is safe because every file there has a content hash in its filename — a change in content always means a new URL, so a stale cached copy is never served. `fonts/*` isn't hashed, but the font files are static and not expected to change; if they ever do, rename the file (and update the `@font-face`/preload references in `styles.css`/`index.html`) rather than relying on cache invalidation. `index.html` isn't covered by either rule, so it's revalidated normally — that's what points visitors at the current asset hashes, and the current coin data, after each deploy.
 
 ## Cost/scaling model
 
