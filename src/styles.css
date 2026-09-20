@@ -156,12 +156,12 @@ body {
   --surface-alt: light-dark(#f1eee5, #2a2f29);
   --border: light-dark(#e4e0d4, #343a33);
   --text-secondary: light-dark(#6b7268, #a6ada1);
-  --text-muted: light-dark(#9ba096, #767c72);
+  --text-muted: light-dark(#73766f, #848b80);
   --primary: light-dark(#6b8e63, #8fb586);
   --primary-strong: light-dark(#4a6444, #a9cba1);
   --accent-soft: light-dark(#e6eee2, #2c3a2a);
-  --positive: light-dark(#6b8e63, #8fb586);
-  --negative: light-dark(#c17a5e, #d79379);
+  --positive: light-dark(#5e7d57, #8fb586);
+  --negative: light-dark(#a3664e, #d79379);
 
   background: var(--surface);
   border: 1px solid var(--border);
