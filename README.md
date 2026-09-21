@@ -1,8 +1,12 @@
 # CoinPeas Static
 
-A small serverless cryptocurrency website hosted entirely on Cloudflare.
+A small, serverless site showing the top 100 cryptocurrencies by market cap, hosted entirely on Cloudflare.
 
-The public website is **100% static** — Cloudflare serves every request directly from the edge as a static asset, so normal visitors never invoke Worker code, for free, regardless of traffic volume.
+Built for lightweight network use, where every kilobyte counts: no frameworks, no trackers, no unnecessary requests — just the data, built with efficiency in mind.
+
+The public website is **100% static** — Cloudflare serves every request directly from the edge as a static asset, so normal visitors never invoke Worker code, for free, regardless of traffic volume. The architecture was deliberately chosen to keep it that way, with no servers to run or pay for.
+
+Nearly all of the code, and this README, was written by AI (Claude), directed toward a specific intended outcome and reviewed in detail rather than accepted as-is. Design decisions, tradeoffs, and correctness remain a human responsibility throughout.
 
 ## Architecture
 
@@ -34,34 +38,31 @@ The public website is **100% static** — Cloudflare serves every request direct
                           Visitors
 ```
 
-`coinpeas` is an assets-only Worker (no `main` script) — it just serves static assets, so there's no application code on the read path. All data refreshing happens outside Cloudflare, in a GitHub Actions cron workflow that fetches fresh coin data and redeploys on a schedule (see [Cron schedule](#cron-schedule)). `wrangler deploy` computes the static asset manifest itself — no hand-rolled Cloudflare API calls or asset-hash bookkeeping.
+`coinpeas` is an assets-only Worker — it just serves static files, with no application code on the read path. A GitHub Actions cron workflow does all the real work outside Cloudflare: fetching fresh coin data, rebuilding the site, and redeploying it on a schedule (see [Cron schedule](#cron-schedule)). Redeploying on every update, rather than running a live backend, means there's no origin server to operate — Cloudflare's edge network caches and serves the static output worldwide, and the GitHub Actions workflow is the only recurring cost surface.
 
-`src/coins.json` is inlined straight into `index.html` as `window.__COINS__`, by a `transformIndexHtml` plugin in `vite.config.js`, rather than fetched over HTTP or imported as its own chunk. `index.html` is served un-hashed and revalidated on every visit anyway (it's what points visitors at the current asset hashes after each deploy), so baking the data into it costs nothing in cacheability and saves app.js a round trip to fetch the data separately after it loads.
+`src/coins.json` is inlined directly into `index.html` at build time instead of being fetched separately. `index.html` is already revalidated on every visit (it's what points visitors at the current asset hashes), so this adds no cacheability cost and saves an extra request.
 
-## Setup
+## Static asset caching
 
-Requirements: Node.js, npm, a Cloudflare account with a domain managed by Cloudflare, and a GitHub repository for the scheduled Actions workflow.
+`public/_headers` marks `assets/*` and `fonts/*` as immutable and cacheable for a year:
 
-```bash
-npm install
+```text
+/assets/*
+  Cache-Control: public, max-age=31536000, immutable
+
+/fonts/*
+  Cache-Control: public, max-age=31536000, immutable
 ```
 
-### Hostname
+`assets/*` is safe because every file there has a content hash in its filename — a change in content always means a new URL, so a stale cached copy is never served. `fonts/*` isn't hashed, but the font files are static and not expected to change; if they ever do, rename the file (and update the `@font-face`/preload references in `styles.css`/`index.html`) rather than relying on cache invalidation. `index.html` isn't covered by either rule, so it's revalidated normally — that's what points visitors at the current asset hashes, and the current coin data, after each deploy.
 
-The apex domain is bound as a custom domain in `wrangler.jsonc`, so Cloudflare provisions DNS/TLS for it and routes it to this Worker:
+## Deployment
 
-```json
-"routes": [
-  {
-    "pattern": "coinpeas.com",
-    "custom_domain": true
-  }
-]
-```
+Requirements: a Cloudflare account with a domain managed by Cloudflare, and a GitHub repository for the scheduled Actions workflow.
 
-This route is currently commented out in `wrangler.jsonc` until `coinpeas.com` is actually registered and added as a Cloudflare zone — until then, deploys publish to the free `coinpeas.<account-subdomain>.workers.dev` instead.
+### Setup
 
-### GitHub Actions secrets and variables
+#### GitHub Actions secrets and variables
 
 The workflow reads a few values from the GitHub repository itself, not from any file in this repo. They live under **Settings → Secrets and variables → Actions**, split across two tabs:
 
@@ -84,7 +85,7 @@ The workflow reads a few values from the GitHub repository itself, not from any 
 
 Once all three secrets and the `DEPLOY_ENABLED` variable are set, the next scheduled run (or a manual one via **Actions → Update coin data → Run workflow**) will deploy for real.
 
-## Update flow
+### Update flow
 
 On each scheduled run, `.github/workflows/update-coins.yml`:
 
@@ -95,7 +96,7 @@ On each scheduled run, `.github/workflows/update-coins.yml`:
 
 You can also run this same sequence manually at any time with `npm run deploy`, e.g. to push a code change immediately without waiting for the next scheduled run.
 
-## Cron schedule
+### Cron schedule
 
 `.github/workflows/update-coins.yml` uses:
 
@@ -110,25 +111,13 @@ The interval comfortably stays within CoinGecko's free "Demo" plan limits: 100 r
 
 On a public repository, GitHub Actions minutes are unlimited and free. On a private repository, factor in the ~2,000 free minutes/month and widen the interval if needed.
 
-## Static asset caching
-
-`public/_headers` marks `assets/*` and `fonts/*` as immutable and cacheable for a year:
-
-```text
-/assets/*
-  Cache-Control: public, max-age=31536000, immutable
-
-/fonts/*
-  Cache-Control: public, max-age=31536000, immutable
-```
-
-`assets/*` is safe because every file there has a content hash in its filename — a change in content always means a new URL, so a stale cached copy is never served. `fonts/*` isn't hashed, but the font files are static and not expected to change; if they ever do, rename the file (and update the `@font-face`/preload references in `styles.css`/`index.html`) rather than relying on cache invalidation. `index.html` isn't covered by either rule, so it's revalidated normally — that's what points visitors at the current asset hashes, and the current coin data, after each deploy.
-
-## Cost/scaling model
-
-Normal visitor requests are served as Cloudflare Static Assets — there is no Worker application logic on the read path, so public traffic can grow without turning page views into billed Worker executions. The only recurring cost surface is the GitHub Actions workflow, which runs outside Cloudflare entirely.
-
 ## Local development
+
+Requirements: Node.js and npm.
+
+```bash
+npm install
+```
 
 Run the Vite development server:
 
