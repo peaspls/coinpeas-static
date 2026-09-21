@@ -33,7 +33,6 @@ const FIELDS = [
   "price_change_percentage_24h",
   "market_cap",
   "total_volume",
-  "last_updated",
 ];
 
 const headers = {};
@@ -65,10 +64,8 @@ async function fetchCoins() {
         throw new Error("CoinGecko returned an empty or invalid coin list");
       }
 
-      // Keep only the fields src/app.js renders, plus last_updated (not
-      // rendered yet, but kept since CoinGecko's own cache means a coin's
-      // price can be older than this script's generated_at) — CoinGecko's
-      // raw objects carry ~25 fields (ath, atl, supply figures, roi, ...)
+      // Keep only the fields src/app.js renders — CoinGecko's raw objects
+      // carry ~25 fields (ath, atl, supply figures, roi, last_updated, ...)
       // that would otherwise be downloaded by every visitor for no reason.
       // Written columnar (one array per field, see FIELDS above) rather than
       // one object per coin: grouping same-typed values together compresses
