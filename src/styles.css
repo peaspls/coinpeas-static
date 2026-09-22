@@ -435,6 +435,25 @@ body {
   letter-spacing: -0.01em;
 }
 
+.footer-vine {
+  display: block;
+  width: 100%;
+  max-width: 420px;
+  /* Fixed height + slice (see the SVG) crops the sides on narrow screens
+     rather than shrinking the scene to fit. */
+  height: 54px;
+  margin: 16px auto 0;
+  color: var(--primary);
+  opacity: 0.28;
+  /* Fade the cropped ends so the vine doesn't stop abruptly. */
+  mask-image: linear-gradient(to right, transparent, #000 18%, #000 82%, transparent);
+
+  /* Keep line weight constant if the band scales. */
+  * {
+    vector-effect: non-scaling-stroke;
+  }
+}
+
 @media (max-width: 767px) {
   .col-volume {
     display: none;

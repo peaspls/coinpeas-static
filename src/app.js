@@ -8,6 +8,7 @@ import {
   THEME_ICON_SYSTEM,
   THEME_ICON_DARK,
   INFO_ICON,
+  FOOTER_VINE_SVG,
 } from "./icons.js";
 
 const THEME_STORAGE_KEY = "coinpeas-theme";
@@ -98,6 +99,7 @@ function renderShell() {
             <br />
             Give peas a chance. A <a class="footer-link" href="https://github.com/peaspls" target="_blank" rel="noopener">peaspls</a> project · <a class="footer-link" href="https://github.com/peaspls/coinpeas-static" target="_blank" rel="noopener">View source on GitHub</a>
           </p>
+          ${FOOTER_VINE_SVG}
         </footer>
       </main>
     </div>`;
