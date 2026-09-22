@@ -58,7 +58,7 @@ function renderShell() {
               ${INFO_ICON}
             </button>
             <div id="updated-info-popover" class="info-popover" role="tooltip" hidden>
-              Data updates on the hour and every 15 min after. Reload the page to see the latest.
+              Data updates every hour, on the hour. Reload the page to see the latest.
             </div>
           </div>
         </div>

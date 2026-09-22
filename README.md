@@ -102,7 +102,7 @@ You can also run this same sequence manually at any time with `npm run deploy`, 
 
 ```yaml
 schedule:
-  - cron: "*/15 * * * *"
+  - cron: "0 * * * *"
 ```
 
 This runs on the interval set above, in UTC. GitHub Actions schedules can lag under load, so treat that interval as a target, not a guarantee.
