@@ -40,8 +40,8 @@ function renderShell() {
 
       <main class="content">
         <section class="intro">
-          <h1>A view of the crypto market</h1>
-          <p>Top 100 crypto coins, ranked by market cap.</p>
+          <h1>Top 100 coins by market cap</h1>
+          <p>Efficient, as far as is possible and practicable.</p>
         </section>
 
         <div id="list-meta" class="list-meta" hidden>
@@ -89,14 +89,14 @@ function renderShell() {
         <footer id="site-footer" class="site-footer" hidden>
           <a class="attribution" href="https://www.coingecko.com/en/api/" target="_blank" rel="noopener">Powered by CoinGecko API</a>
           <p>
+            Not financial advice. Do your own research —
+            CoinPeas isn't liable for how you use this data.<br />
             <span class="footer-mark">
               ${BRAND_MARK_SVG}
               <span class="footer-mark-text" id="footer-host"></span>
             </span>
             <br />
-            Not financial advice — crypto is volatile, so always do your own research.
-            CoinPeas isn't liable for decisions made using this data.<br />
-            A small project by <a class="footer-link" href="https://github.com/peaspls" target="_blank" rel="noopener">peaspls</a>, for every creature that shares this world — <a class="footer-link" href="https://github.com/peaspls/coinpeas-static" target="_blank" rel="noopener">view source on GitHub</a>.
+            Give peas a chance. A <a class="footer-link" href="https://github.com/peaspls" target="_blank" rel="noopener">peaspls</a> project · <a class="footer-link" href="https://github.com/peaspls/coinpeas-static" target="_blank" rel="noopener">View source on GitHub</a>
           </p>
         </footer>
       </main>

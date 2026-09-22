@@ -422,6 +422,7 @@ body {
   align-items: center;
   gap: 6px;
   vertical-align: middle;
+  margin-top: 12px;
   color: var(--text-muted);
 
   svg {
