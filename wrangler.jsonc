@@ -4,19 +4,13 @@
   "compatibility_date": "2026-09-15",
   "assets": {
     "directory": "./dist"
-  }
+  },
 
-  // Custom domain route removed for now — coinpeas.com isn't registered
-  // yet, and a route pointing at a domain with no matching zone in the
-  // account would fail wrangler deploy. Until then, this deploys to the
-  // free coinpeas.<account-subdomain>.workers.dev instead. Add this back
-  // once the domain is bought and added as a Cloudflare zone. No `www`
-  // route/redirect — kept to just the apex domain.
-  //
-  // "routes": [
-  //   {
-  //     "pattern": "coinpeas.com",
-  //     "custom_domain": true
-  //   }
-  // ]
+  // Served on the apex domain only. No `www` route/redirect.
+  "routes": [
+    {
+      "pattern": "coinpeas.com",
+      "custom_domain": true
+    }
+  ]
 }
