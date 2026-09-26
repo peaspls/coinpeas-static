@@ -3,10 +3,11 @@ name: Update coin data
 # When this workflow runs.
 on:
   # Runs automatically on a recurring schedule, defined in cron syntax
-  # ("0 * * * *" = on the hour, every hour, in UTC). See the Cron schedule
-  # section in README.md for more on this.
+  # ("10 * * * *" = ten past every hour, in UTC). Deliberately off the top of
+  # the hour, which GitHub names as a high-load time when scheduled runs get
+  # delayed or dropped. See the Cron schedule section in README.md for more.
   schedule:
-    - cron: "0 * * * *"
+    - cron: "10 * * * *"
   # Also allows triggering it by hand from the GitHub UI
   # (Actions -> Update coin data -> Run workflow), or via the API/gh CLI.
   workflow_dispatch:

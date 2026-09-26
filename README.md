@@ -102,10 +102,10 @@ You can also run this same sequence manually at any time with `npm run deploy`, 
 
 ```yaml
 schedule:
-  - cron: "0 * * * *"
+  - cron: "10 * * * *"
 ```
 
-This runs on the interval set above, in UTC. GitHub Actions schedules can lag under load, so treat that interval as a target, not a guarantee.
+This runs at ten past every hour, in UTC. GitHub Actions schedules can lag or be dropped under load, especially at the start of every hour, so the schedule deliberately avoids :00. Even so, treat it as a target, not a guarantee.
 
 The interval comfortably stays within CoinGecko's free "Demo" plan limits: 100 requests/minute and 10,000 call credits/month. At one request per run, only a very short interval (a handful of minutes) would meaningfully risk the monthly cap — there's plenty of headroom for manual `workflow_dispatch` runs or a shorter interval later if needed.
 
