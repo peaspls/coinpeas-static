@@ -111,7 +111,10 @@ jobs:
       # this step (missing secrets resolve to an empty string, not an
       # error) for as long as the secrets are missing.
       - if: vars.DEPLOY_ENABLED == 'true'
-        run: npx wrangler deploy --config wrangler.jsonc --message "GitHub Actions ($TRIGGER) deploy — run #${{ github.run_number }}"
+        # Block scalar (`|`) so YAML keeps the " #" below: in a plain value it
+        # would start a comment and cut the command off mid-string.
+        run: |
+          npx wrangler deploy --config wrangler.jsonc --message "GitHub Actions ($TRIGGER) deploy — run #${{ github.run_number }}"
         env:
           # Wrangler reads these environment variables directly.
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
