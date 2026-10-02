@@ -63,28 +63,17 @@ Requirements: a Cloudflare account with a domain managed by Cloudflare, and a Gi
 
 ### Setup
 
-#### GitHub Actions secrets and variables
+#### GitHub Actions secrets
 
-The workflow reads a few values from the GitHub repository itself, not from any file in this repo. They live under **Settings → Secrets and variables → Actions**, split across two tabs:
-
-- **Secrets** — for sensitive values. Encrypted at rest, and GitHub never shows the value again after you save it.
-- **Variables** — for plain, non-sensitive config. Visible in the UI, so use this for anything that doesn't need to be hidden.
-
-**Secrets** (add each with **New repository secret**):
+The workflow reads a few secrets from the GitHub repository itself, not from any file in this repo. They live under **Settings → Secrets and variables → Actions → Secrets**; add each with **New repository secret**. Secrets are encrypted at rest, and GitHub never shows the value again after you save it.
 
 | Name | Required? | What it's for |
 |---|---|---|
 | `CLOUDFLARE_API_TOKEN` | Yes | Lets the workflow run `wrangler deploy`. Create one in the Cloudflare dashboard with `Account → Workers Scripts → Edit` permission. |
-| `CLOUDFLARE_ACCOUNT_ID` | Yes | Your Cloudflare account ID. Not actually sensitive, but kept as a secret anyway since that's where `wrangler-action` looks for it. |
+| `CLOUDFLARE_ACCOUNT_ID` | Yes | Your Cloudflare account ID. Not actually sensitive, but kept as a secret next to the API token. The workflow passes both to Wrangler as environment variables. |
 | `COINGECKO_API_KEY` | No | Raises CoinGecko's rate limit. The public API works fine without one — only add this if you start hitting limits. Sent as the `x-cg-demo-api-key` header; the frontend never sees it. |
 
-**Variables** (add with **New repository variable**):
-
-| Name | Required? | What it's for |
-|---|---|---|
-| `DEPLOY_ENABLED` | Yes, once you're ready to go live | The workflow's deploy step only runs when this is set to exactly `true`. Until then, it's skipped instead of failing — so you can push this repo (and let the scheduled fetch run) before the Cloudflare secrets above even exist, without every run failing at the deploy step. |
-
-Once all three secrets and the `DEPLOY_ENABLED` variable are set, the next scheduled run (or a manual one via **Actions → Deploy → Run workflow**) will deploy for real.
+Once the two required secrets are set, the next scheduled run (or a manual one via **Actions → Deploy → Run workflow**) will deploy.
 
 ### Update flow
 
@@ -92,7 +81,7 @@ On each run, `.github/workflows/deploy.yml`:
 
 1. Checks out the repo.
 2. `npm run fetch-coins` — fetches the top 20 coins from CoinGecko (with a timeout and retries) and overwrites `data/coins.json`, trimmed to just the fields the frontend renders. This runs *before* the build, since Vite reads `data/coins.json` at build time to inline it into `index.html`.
-3. `npm ci` + `npm run build` (Vite) — rebuilds `dist/` from scratch. This runs on every scheduled run now, since coin data changes (and therefore the build output) on almost every run — there's no longer a data-only update path that can skip straight to deploy.
+3. `npm ci` + `npm run build` (Vite) — rebuilds `dist/` from scratch on every run, since the coin data (and therefore the build output) changes on almost every run.
 4. `wrangler deploy` uploads `dist/` as a new `coinpeas` version.
 
 You can also run this same sequence manually at any time with `npm run deploy`, e.g. to push a code change immediately without waiting for the next scheduled run.
