@@ -10,8 +10,9 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "fetch-coins": "node scripts/fetch-coins.mjs src/coins.json",
-    "deploy": "npm run fetch-coins && npm run build && wrangler deploy --message \"Manual deploy\""
+    "fetch-coins": "node scripts/fetch-coins.mjs data/coins.json",
+    "deploy": "npm run fetch-coins && npm run build && wrangler deploy --message \"Manual deploy\"",
+    "deploy-cron": "wrangler deploy --config cron/wrangler.jsonc"
   },
   "devDependencies": {
     "vite": "^8.3.0",

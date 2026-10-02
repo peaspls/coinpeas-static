@@ -1,6 +1,6 @@
 # CoinPeas Static
 
-A small, serverless site showing the top 100 cryptocurrencies by market cap, hosted entirely on Cloudflare.
+A small, serverless site showing the top 20 cryptocurrencies by market cap, hosted entirely on Cloudflare.
 
 Built for lightweight network use, where every kilobyte counts: no frameworks, no trackers, no unnecessary requests — just the data, built with efficiency in mind.
 
@@ -11,14 +11,15 @@ Nearly all of the code, and this README, was written by AI (Claude), directed to
 ## Architecture
 
 ```text
-                         CoinGecko
+                   coinpeas-cron Worker
+                  (Cloudflare Cron Trigger)
                              │
-                         on a schedule
+              every-3-hours workflow_dispatch
                              │
                              ▼
                   ┌───────────────────────┐
-                  │ GitHub Actions        │
-                  │ scheduled workflow    │
+                  │ GitHub Actions        │   ◄── CoinGecko
+                  │ deploy workflow       │
                   │ (fetch → build →      │
                   │  deploy, every run)   │
                   └───────────┬───────────┘
@@ -38,9 +39,9 @@ Nearly all of the code, and this README, was written by AI (Claude), directed to
                           Visitors
 ```
 
-`coinpeas` is an assets-only Worker — it just serves static files, with no application code on the read path. A GitHub Actions cron workflow does all the real work outside Cloudflare: fetching fresh coin data, rebuilding the site, and redeploying it on a schedule (see [Cron schedule](#cron-schedule)). Redeploying on every update, rather than running a live backend, means there's no origin server to operate — Cloudflare's edge network caches and serves the static output worldwide, and the GitHub Actions workflow is the only recurring cost surface.
+`coinpeas` is an assets-only Worker — it just serves static files, with no application code on the read path. A GitHub Actions workflow does all the real work outside Cloudflare: fetching fresh coin data, rebuilding the site, and redeploying it. A separate, tiny `coinpeas-cron` Worker starts that workflow every three hours (see [Cron schedule](#cron-schedule)); it runs only on its schedule and serves no requests. Redeploying on every update, rather than running a live backend, means there's no origin server to operate — Cloudflare's edge network caches and serves the static output worldwide, and the GitHub Actions workflow is the only recurring cost surface.
 
-`src/coins.json` is inlined directly into `index.html` at build time instead of being fetched separately. `index.html` is already revalidated on every visit (it's what points visitors at the current asset hashes), so this adds no cacheability cost and saves an extra request.
+`data/coins.json` is inlined directly into `index.html` at build time instead of being fetched separately. `index.html` is already revalidated on every visit (it's what points visitors at the current asset hashes), so this adds no cacheability cost and saves an extra request.
 
 ## Static asset caching
 
@@ -83,14 +84,14 @@ The workflow reads a few values from the GitHub repository itself, not from any 
 |---|---|---|
 | `DEPLOY_ENABLED` | Yes, once you're ready to go live | The workflow's deploy step only runs when this is set to exactly `true`. Until then, it's skipped instead of failing — so you can push this repo (and let the scheduled fetch run) before the Cloudflare secrets above even exist, without every run failing at the deploy step. |
 
-Once all three secrets and the `DEPLOY_ENABLED` variable are set, the next scheduled run (or a manual one via **Actions → Update coin data → Run workflow**) will deploy for real.
+Once all three secrets and the `DEPLOY_ENABLED` variable are set, the next scheduled run (or a manual one via **Actions → Deploy → Run workflow**) will deploy for real.
 
 ### Update flow
 
-On each scheduled run, `.github/workflows/update-coins.yml`:
+On each run, `.github/workflows/deploy.yml`:
 
 1. Checks out the repo.
-2. `npm run fetch-coins` — fetches the top 100 coins from CoinGecko (with a timeout and retries) and overwrites `src/coins.json`, trimmed to just the fields the frontend renders. This runs *before* the build, since Vite reads `src/coins.json` at build time to inline it into `index.html`.
+2. `npm run fetch-coins` — fetches the top 20 coins from CoinGecko (with a timeout and retries) and overwrites `data/coins.json`, trimmed to just the fields the frontend renders. This runs *before* the build, since Vite reads `data/coins.json` at build time to inline it into `index.html`.
 3. `npm ci` + `npm run build` (Vite) — rebuilds `dist/` from scratch. This runs on every scheduled run now, since coin data changes (and therefore the build output) on almost every run — there's no longer a data-only update path that can skip straight to deploy.
 4. `wrangler deploy` uploads `dist/` as a new `coinpeas` version.
 
@@ -98,14 +99,43 @@ You can also run this same sequence manually at any time with `npm run deploy`, 
 
 ### Cron schedule
 
-`.github/workflows/update-coins.yml` uses:
+The workflow has no GitHub `schedule:` trigger, since those can start late or skip runs under load. Instead, the `coinpeas-cron` Worker in `cron/` uses a Cloudflare Cron Trigger to call GitHub's `workflow_dispatch` API:
 
-```yaml
-schedule:
-  - cron: "10 * * * *"
+```jsonc
+"triggers": {
+  "crons": ["10 */3 * * *"]
+}
 ```
 
-This runs at ten past every hour, in UTC. GitHub Actions schedules can lag or be dropped under load, especially at the start of every hour, so the schedule deliberately avoids :00. Even so, treat it as a target, not a guarantee.
+That's ten past every third hour (00:10, 03:10, 06:10, …), in UTC. It's deliberately off the top of the hour, when cron schedulers are busiest. Each run's deploy message in Cloudflare reads "GitHub Actions (scheduled by Cloudflare Worker coinpeas-cron) deploy", so you can tell these runs apart from manual ones.
+
+One-time setup:
+
+1. On GitHub, create a **fine-grained personal access token** (**Settings → Developer settings → Personal access tokens → Fine-grained tokens**) with access to only this repository and only the **Actions: Read and write** permission. If it leaks, the worst anyone can do with it is start this workflow.
+2. Store it as a Worker secret (Wrangler prompts for the value):
+   ```bash
+   npx wrangler secret put GITHUB_TOKEN --config cron/wrangler.jsonc
+   ```
+3. Deploy the Worker:
+   ```bash
+   npm run deploy-cron
+   ```
+
+It only needs redeploying if `cron/` changes, not on every site deploy. Runs and failures show in the Cloudflare dashboard under the `coinpeas-cron` Worker's logs. When the token expires, the scheduled runs stop until you repeat steps 1–2.
+
+#### Free plan limits
+
+Both Workers fit comfortably in Cloudflare's free Workers plan ([limits](https://developers.cloudflare.com/workers/platform/limits/), [pricing](https://developers.cloudflare.com/workers/platform/pricing/)):
+
+| Free plan limit | What this project uses |
+|---|---|
+| Static asset requests: free and unlimited | Every visitor request to the site. The `coinpeas` Worker only serves assets, so visitors never run Worker code. |
+| 100,000 Worker requests/day | 8 cron runs/day from `coinpeas-cron`, even if every run counts. |
+| 10 ms CPU time per invocation (cron runs included) | Well under 1 ms: one `fetch` call. Waiting for GitHub's response doesn't count as CPU time. |
+| 5 Cron Triggers per account | 1 |
+| 100 Workers per account | 2 (`coinpeas` and `coinpeas-cron`) |
+
+So the cron could run every minute (1,440 runs a day) and stay far under the request limit. The real limits on how often it can run are GitHub Actions and CoinGecko's API quota (below).
 
 The interval comfortably stays within CoinGecko's free "Demo" plan limits: 100 requests/minute and 10,000 call credits/month. At one request per run, only a very short interval (a handful of minutes) would meaningfully risk the monthly cap — there's plenty of headroom for manual `workflow_dispatch` runs or a shorter interval later if needed.
 
@@ -125,7 +155,7 @@ Run the Vite development server:
 npm run dev
 ```
 
-This renders the static `src/coins.json` fixture as-is — dev intentionally never fetches live data, so it stays fast and deterministic regardless of CoinGecko's availability or rate limits. `npm run fetch-coins` is reserved for deploys and always targets `src/coins.json`; running it locally would overwrite the git-tracked fixture, so only do that deliberately (e.g. after changing which fields `fetch-coins.mjs` keeps) and review the diff before committing:
+This renders the static `data/coins.json` fixture as-is — dev intentionally never fetches live data, so it stays fast and deterministic regardless of CoinGecko's availability or rate limits. `npm run fetch-coins` is reserved for deploys and always targets `data/coins.json`; running it locally would overwrite the git-tracked fixture, so only do that deliberately (e.g. after changing which fields `fetch-coins.mjs` keeps) and review the diff before committing:
 
 ```bash
 npm run fetch-coins

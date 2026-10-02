@@ -1,0 +1,17 @@
+{
+  "$schema": "../node_modules/wrangler/config-schema.json",
+  "name": "coinpeas-cron",
+  "main": "index.js",
+  "compatibility_date": "2026-09-15",
+
+  // Every three hours, at ten past the hour (UTC) rather than on it: cron
+  // schedulers are busiest at :00, on both Cloudflare's and GitHub's side.
+  "triggers": {
+    "crons": ["10 */3 * * *"]
+  },
+
+  // Scheduled-only, so there's nothing to serve: no workers.dev URL and no
+  // preview URLs.
+  "workers_dev": false,
+  "preview_urls": false
+}

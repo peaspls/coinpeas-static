@@ -1,12 +1,12 @@
 import { readFileSync } from "node:fs";
 import { defineConfig } from "vite";
 
-const COINS_PATH = new URL("./src/coins.json", import.meta.url);
+const COINS_PATH = new URL("./data/coins.json", import.meta.url);
 
 // Bakes coins.json straight into index.html as a global (window.__COINS__)
 // via the transformIndexHtml hook. Vite calls this on every dev-server 
 // request and once at build time, so it always reflects whatever is 
-// currently in src/coins.json.
+// currently in data/coins.json.
 function inlineCoinsData() {
   return {
     name: "inline-coins-data",

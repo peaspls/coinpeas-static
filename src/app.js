@@ -41,7 +41,7 @@ function renderShell() {
 
       <main class="content">
         <section class="intro">
-          <h1>Top 100 coins by market cap</h1>
+          <h1>Top 20 coins by market cap</h1>
           <p>Efficient, as far as is possible and practicable.</p>
         </section>
 
@@ -59,7 +59,7 @@ function renderShell() {
               ${INFO_ICON}
             </button>
             <div id="updated-info-popover" class="info-popover" role="tooltip" hidden>
-              Data updates about once an hour, usually shortly after ten past the hour (UTC). Reload the page to see the latest.
+              Data updates about every three hours, usually shortly after ten past the hour (UTC). Reload the page to see the latest.
             </div>
           </div>
         </div>
@@ -219,10 +219,8 @@ function escapeHTML(str) {
 
 // ---------- Rendering ----------
 
-// coins.json stores columns (one array per field) rather than one object
-// per coin, so field names aren't repeated 100 times over — reassemble
-// rows here, where it only costs a lookup per coin per page load rather
-// than a repeated field name per coin in the transferred file.
+// The coin data comes as columns (one array per field) rather than one
+// object per coin, so reassemble it into one object per row.
 function toCoinObjects(columns) {
   const fields = Object.keys(columns);
   const count = columns[fields[0]]?.length ?? 0;
@@ -295,18 +293,16 @@ function updateCacheMeta(data) {
 }
 
 // ---------- Data loading ----------
-// coins.json is refreshed by a build-time script (see scripts/fetch-coins.mjs)
-// and inlined into index.html as window.__COINS__ by vite.config.js's
-// transformIndexHtml plugin, so it's already on the page by the time this
-// runs — no import, fetch, or cache-control dance needed.
+// The coin data is already on the page as window.__COINS__ by the time this
+// runs, so there's nothing to fetch.
 
 function loadCoins() {
   try {
     const data = window.__COINS__;
-    // A columnar coins.json always has a "name" column; checking for it
-    // also confirms `data.coins` itself is present and the right shape.
+    // The columnar data always has a "name" column; checking for it also
+    // confirms `data.coins` itself is present and the right shape.
     if (!Array.isArray(data?.coins?.name)) {
-      throw new Error("Invalid coins.json");
+      throw new Error("Invalid coin data");
     }
     renderRows(toCoinObjects(data.coins));
     updateCacheMeta(data);
