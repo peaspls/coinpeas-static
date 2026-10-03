@@ -20,7 +20,7 @@ export default {
       },
       // `trigger` ends up in the deploy message, so each deploy says what
       // started it.
-      body: JSON.stringify({ ref: "main", inputs: { trigger: "scheduled by Cloudflare Worker coinpeas-cron" } }),
+      body: JSON.stringify({ ref: "main", inputs: { trigger: "Cloudflare coinpeas-cron" } }),
     });
 
     // Throwing marks this cron run as failed in the Worker's logs.
