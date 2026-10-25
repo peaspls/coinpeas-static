@@ -80,7 +80,6 @@ function renderShell() {
                   <th class="col-price">Price</th>
                   <th class="col-change">24h</th>
                   <th class="col-marketcap">Market Cap</th>
-                  <th class="col-volume">24h Volume</th>
                 </tr>
               </thead>
               <tbody id="coin-rows"></tbody>
@@ -255,7 +254,6 @@ function renderRows(coins) {
         <td class="col-price">${formatPrice(coin.current_price)}</td>
         <td class="col-change ${changeClass}">${formatChange(change)}</td>
         <td class="col-marketcap">${formatCompactUSD(coin.market_cap)}</td>
-        <td class="col-volume">${formatCompactUSD(coin.total_volume)}</td>
       </tr>`;
   }).join("");
 

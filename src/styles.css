@@ -369,43 +369,37 @@ body {
 }
 
 .col-price,
-.col-marketcap,
-.col-volume {
+.col-marketcap {
   font-size: 0.844rem;
 }
 
-.col-rank {
+/* Just wide enough for the cell's left padding and a two-digit rank; the
+   coin column's own padding keeps the gap, and it takes whatever width the
+   other columns leave. */
+.coin-table .col-rank {
+  width: 46px;
+  padding-right: 0;
   color: var(--text-muted);
-  width: 9%;
   text-overflow: clip;
 }
 
 .col-coin {
   text-align: left;
-  width: 28%;
 }
 
 .col-price {
-  width: 16%;
+  width: 19%;
   color: var(--text);
 }
 
-.col-marketcap,
-.col-volume {
+.col-marketcap {
+  width: 23%;
   color: var(--text-secondary);
 }
 
-.col-marketcap {
-  width: 16%;
-}
-
 .col-change {
-  width: 13%;
+  width: 15%;
   font-weight: 500;
-}
-
-.col-volume {
-  width: 18%;
 }
 
 .coin-cell {
@@ -620,32 +614,6 @@ body {
   vertical-align: -5px;
 }
 
-@media (max-width: 767px) {
-  .col-volume {
-    display: none;
-  }
-
-  .col-rank {
-    width: 10%;
-  }
-
-  .col-coin {
-    width: 33%;
-  }
-
-  .col-price {
-    width: 19%;
-  }
-
-  .col-change {
-    width: 15%;
-  }
-
-  .col-marketcap {
-    width: 23%;
-  }
-}
-
 @media (max-width: 640px) {
   .page {
     padding: 20px 14px 0;
@@ -655,20 +623,16 @@ body {
     display: none;
   }
 
-  .col-rank {
-    width: 12%;
-  }
-
-  .col-coin {
-    width: 38%;
+  .coin-table .col-rank {
+    width: 34px;
   }
 
   .col-price {
-    width: 25%;
+    width: 30%;
   }
 
   .col-change {
-    width: 25%;
+    width: 26%;
   }
 
   .coin-table th,
@@ -682,47 +646,27 @@ body {
 }
 
 @media (max-width: 460px) {
-  .col-rank {
-    width: 14%;
-  }
-
-  .col-coin {
-    width: 34%;
-  }
-
-  .col-price {
-    width: 26%;
-  }
-
-  .col-change {
-    width: 26%;
-  }
-
   .coin-table th,
   .coin-table td {
     padding: 10px 12px;
   }
 
-  .coin-table th.col-rank,
-  .coin-table td.col-rank {
-    padding-right: 6px;
+  .coin-table .col-rank {
+    width: 36px;
   }
 }
 
 @media (max-width: 380px) {
-  .col-rank {
-    display: none;
+  .coin-table th,
+  .coin-table td {
+    padding: 10px 8px;
   }
 
-  .col-coin {
-    width: 40%;
+  .coin-table .col-rank {
+    width: 32px;
   }
 
   .col-price {
-    width: 30%;
-  }
-
-  .col-change {
-    width: 30%;
+    width: 34%;
   }
 }

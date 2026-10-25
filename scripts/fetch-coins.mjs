@@ -6,7 +6,8 @@ import path from "node:path";
 
 const COINGECKO_URL =
   "https://api.coingecko.com/api/v3/coins/markets" +
-  "?vs_currency=usd&order=market_cap_desc&per_page=50&page=1&sparkline=false";
+  "?vs_currency=usd&order=market_cap_desc&per_page=50&page=1&sparkline=true" +
+  "&price_change_percentage=1h,7d,30d";
 
 if (!process.argv[2]) {
   throw new Error("Usage: node scripts/fetch-coins.mjs <output-path>");
@@ -26,7 +27,6 @@ const FIELDS = [
   "current_price",
   "price_change_percentage_24h",
   "market_cap",
-  "total_volume",
 ];
 
 const headers = {};
@@ -59,7 +59,7 @@ async function fetchCoins() {
       }
 
       // Keep only the fields src/app.js renders — CoinGecko's raw objects
-      // carry ~25 fields (ath, atl, supply figures, roi, last_updated, ...)
+      // carry ~30 fields (ath, atl, supply figures, a 7-day sparkline, ...)
       // that would otherwise be downloaded by every visitor for no reason.
       // Written columnar (one array per field, see FIELDS above) rather than
       // one object per coin: grouping same-typed values together compresses
