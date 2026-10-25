@@ -8,7 +8,8 @@ import {
   THEME_ICON_SYSTEM,
   THEME_ICON_DARK,
   INFO_ICON,
-  FOOTER_VINE_SVG,
+  FOOTER_SCENE_SVG,
+  FOOTER_MOUND_SVG,
 } from "./icons.js";
 
 const THEME_STORAGE_KEY = "coinpeas-theme";
@@ -41,7 +42,7 @@ function renderShell() {
 
       <main class="content">
         <section class="intro">
-          <h1>Top 20 coins by market cap</h1>
+          <h1>Top 50 coins by market cap</h1>
           <p>Efficient, as far as is possible and practicable.</p>
         </section>
 
@@ -87,35 +88,36 @@ function renderShell() {
           </div>
         </section>
 
-        <footer id="site-footer" class="site-footer" hidden>
+        <div id="list-source" class="list-source" hidden>
           <a class="attribution" href="https://www.coingecko.com/en/api/" target="_blank" rel="noopener">Powered by CoinGecko API</a>
-          <p>
-            Not financial advice. Do your own research —
-            CoinPeas isn't liable for how you use this data.<br />
-            <span class="footer-mark">
-              ${BRAND_MARK_SVG}
-              <span class="footer-mark-text" id="footer-host"></span>
-            </span>
-            <br />
-            Give peas a chance. A <a class="footer-link" href="https://github.com/peaspls" target="_blank" rel="noopener">peaspls</a> project · <a class="footer-link" href="https://github.com/peaspls/coinpeas-static" target="_blank" rel="noopener">View source on GitHub</a>
-          </p>
-          ${FOOTER_VINE_SVG}
-        </footer>
+        </div>
       </main>
-    </div>`;
+    </div>
+
+    <footer id="site-footer" class="site-footer" hidden>
+      ${FOOTER_MOUND_SVG}
+      ${FOOTER_SCENE_SVG}
+      <p>
+        Not financial advice. CoinPeas isn't liable for how you use this data.
+      </p>
+      <p class="footer-tagline">
+        <span class="footer-mark" aria-hidden="true">${BRAND_MARK_SVG}</span>
+        Give peas a chance. A <a class="footer-link" href="https://github.com/peaspls" target="_blank" rel="noopener">peaspls</a> project · <a class="footer-link" href="https://github.com/peaspls/coinpeas-static" target="_blank" rel="noopener">View source on GitHub</a>
+      </p>
+    </footer>`;
 }
 
 const ELEMENT_IDS = {
   panel: "panel",
   error: "error-state",
   listMeta: "list-meta",
+  listSource: "list-source",
   tableWrapper: "table-wrapper",
   rows: "coin-rows",
   updatedAt: "updated-at",
   updatedInfoBtn: "updated-info-btn",
   updatedInfoPopover: "updated-info-popover",
   footer: "site-footer",
-  footerHost: "footer-host",
 };
 
 function queryEls() {
@@ -269,6 +271,7 @@ function setViewState(state) {
   els.footer.hidden = false;
   els.error.hidden = state !== "error";
   els.listMeta.hidden = state !== "table";
+  els.listSource.hidden = state !== "table";
   els.tableWrapper.hidden = state !== "table";
 }
 
@@ -357,7 +360,6 @@ function init() {
   initTheme();
   initRetry();
   initInfoPopover();
-  els.footerHost.textContent = window.location.hostname;
   loadCoins();
 }
 

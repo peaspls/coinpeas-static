@@ -32,6 +32,34 @@
   --shadow: 0 1px 2px rgba(35, 40, 31, 0.06), 0 8px 24px rgba(35, 40, 31, 0.05);
   --shadow-dark: 0 1px 2px rgba(0, 0, 0, 0.3), 0 12px 28px rgba(0, 0, 0, 0.35);
   --radius: 14px;
+  /* Season: the footer's ground colour, the footer tree's leaves (none in
+     winter) and, in winter, snow on the ground and branches. */
+  --footer-bg: light-dark(#3d6143, #172617);
+  --leaf: #0000;
+  --leaf2: var(--leaf);
+  --snow: #0000;
+
+  &[data-season="spring"] {
+    --leaf: light-dark(#e8a5b6, #d98fa4);
+    --leaf2: light-dark(#9cc787, #8fc28a);
+    --footer-bg: light-dark(#406446, #19281a);
+  }
+
+  &[data-season="summer"] {
+    --leaf: light-dark(#4f8f4f, #6fb070);
+    --leaf2: light-dark(#7aab55, #9ccf7a);
+  }
+
+  &[data-season="autumn"] {
+    --leaf: light-dark(#c7783a, #d9894f);
+    --leaf2: light-dark(#d1a43c, #c8a855);
+    --footer-bg: light-dark(#5a5a3f, #202115);
+  }
+
+  &[data-season="winter"] {
+    --footer-bg: light-dark(#44605a, #182422);
+    --snow: light-dark(#fff, #c9d3d6);
+  }
 
   &[data-theme="light"] {
     color-scheme: light;
@@ -68,10 +96,33 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
+@media (prefers-reduced-motion: reduce) {
+  .footer-tree {
+    animation: none;
+  }
+
+  .zz {
+    animation: none;
+    opacity: 1;
+  }
+
+  .twinkle {
+    animation: none;
+  }
+}
+
+#app {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
 .page {
+  flex: 1;
+  width: 100%;
   max-width: 920px;
   margin: 0 auto;
-  padding: 28px 20px 56px;
+  padding: 28px 20px 0;
 }
 
 .site-header {
@@ -183,6 +234,11 @@ body {
   align-items: baseline;
   gap: 8px;
   margin-bottom: 8px;
+}
+
+.list-source {
+  margin-top: 8px;
+  text-align: right;
 }
 
 .updated-at {
@@ -390,14 +446,151 @@ body {
   color: var(--negative);
 }
 
+/* A band of "ground" in the season's colour. */
 .site-footer {
-  padding-top: 12px;
+  position: relative;
+  isolation: isolate;
+  overflow-x: clip;
+  --text-muted: light-dark(#ffffffcc, #ffffff9e);
+  margin-top: 120px;
+  padding: 28px 20px 14px;
+  color: light-dark(#f3f5ef, #e2e7dc);
   text-align: center;
+
+  /* The ground itself: wider than the footer (and at least 1400px wide), so
+     its top is a gentle hill whose crest rolls off past the screen's edges
+     rather than dropping at them, and stays nearly level where the scene
+     stands. */
+  &::before {
+    content: "";
+    position: absolute;
+    inset: 0 min(-25%, 50% - 700px);
+    z-index: -1;
+    border-radius: 50% 50% 0 0 / 40px 40px 0 0;
+    background: linear-gradient(#ffffff0d, #0000 60%), var(--footer-bg);
+    /* A layer of snow along the crest. */
+    box-shadow: inset 0 3px var(--snow);
+  }
+}
+
+/* Stands centred on the hill's crest. --ground matches the top of the band
+   (its colour under the gradient), so the mound at the scene's foot merges
+   into the hill; the lines are the band's colour, lifted in dark mode so they
+   stay visible. */
+.footer-scene {
+  display: block;
+  position: absolute;
+  bottom: calc(100% - 16px);
+  left: calc(50% - 240px);
+  width: 480px;
+  height: 130px;
+  --ground: color-mix(in srgb, var(--footer-bg), #fff 5%);
+  color: light-dark(var(--footer-bg), color-mix(in srgb, var(--footer-bg), #fff 35%));
+}
+
+/* Plants follow the season: none in winter, more in summer. */
+.summer-plants,
+[data-season="winter"] .plants {
+  display: none;
+}
+
+[data-season="summer"] .summer-plants {
+  display: inline;
+}
+
+/* Behind the hill, so the hill covers whatever of it lies below the crest. */
+.footer-mound {
+  z-index: -2;
+}
+
+/* The season's leaf colours; at night, muted most of the way toward the
+   scene's line colour, as if seen by moonlight. */
+.leaves {
+  --tone: var(--leaf);
+}
+
+.leaves-alt {
+  --tone: var(--leaf2);
+}
+
+.leaves,
+.leaves-alt {
+  stroke: var(--tone);
+  fill: var(--tone);
+
+  [data-theme="dark"] & {
+    stroke: color-mix(in srgb, var(--tone) 35%, currentColor);
+    fill: color-mix(in srgb, var(--tone) 35%, currentColor);
+  }
+
+  [data-season="winter"] & {
+    display: none;
+  }
+}
+
+.footer-tree {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  animation: sway 9s ease-in-out infinite alternate;
+}
+
+/* Awake by day under the sun; asleep at night, with z's drifting up from the
+   cat and the moon and stars out. */
+.footer-scene :is(.asleep, .night-sky),
+[data-theme="dark"] .footer-scene :is(.awake, .day-sky) {
+  display: none;
+}
+
+[data-theme="dark"] .footer-scene :is(.asleep, .night-sky) {
+  display: inline;
+}
+
+.sun {
+  stroke: #d39a3c;
+  fill: #e9b350;
+}
+
+.twinkle {
+  animation: twinkle 4s ease-in-out infinite alternate;
+}
+
+@keyframes twinkle {
+  to {
+    opacity: 0.35;
+  }
+}
+
+.zz {
+  opacity: 0;
+  animation: doze 6s ease-in-out infinite;
+
+  & + & {
+    animation-delay: 1.5s;
+  }
+}
+
+@keyframes doze {
+  40%,
+  60% {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+    transform: translate(1px, -4px);
+  }
+}
+
+@keyframes sway {
+  from {
+    rotate: -1deg;
+  }
+  to {
+    rotate: 1deg;
+  }
 }
 
 .attribution,
-.site-footer p,
-.footer-mark-text {
+.site-footer p {
   font-size: 0.875rem;
 }
 
@@ -408,7 +601,8 @@ body {
 }
 
 .site-footer p {
-  margin: 16px 0 0;
+  max-width: 40em;
+  margin: 16px auto 0;
   color: var(--text-muted);
 }
 
@@ -417,41 +611,13 @@ body {
   text-decoration: underline;
 }
 
-.footer-mark {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  vertical-align: middle;
-  margin-top: 12px;
-  color: var(--text-muted);
-
-  svg {
-    display: block;
-  }
+.site-footer .footer-tagline {
+  margin-top: 8px;
 }
 
-.footer-mark-text {
-  line-height: 1;
-  letter-spacing: -0.01em;
-}
-
-.footer-vine {
-  display: block;
-  width: 100%;
-  max-width: 420px;
-  /* Fixed height + slice (see the SVG) crops the sides on narrow screens
-     rather than shrinking the scene to fit. */
-  height: 54px;
-  margin: 16px auto 0;
-  color: var(--primary);
-  opacity: 0.28;
-  /* Fade the cropped ends so the vine doesn't stop abruptly. */
-  mask-image: linear-gradient(to right, transparent, #000 18%, #000 82%, transparent);
-
-  /* Keep line weight constant if the band scales. */
-  * {
-    vector-effect: non-scaling-stroke;
-  }
+.footer-mark svg {
+  margin-right: 2px;
+  vertical-align: -5px;
 }
 
 @media (max-width: 767px) {
@@ -482,7 +648,7 @@ body {
 
 @media (max-width: 640px) {
   .page {
-    padding: 20px 14px 40px;
+    padding: 20px 14px 0;
   }
 
   .col-marketcap {

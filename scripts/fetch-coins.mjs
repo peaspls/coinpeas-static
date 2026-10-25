@@ -1,4 +1,4 @@
-// Fetches the top 20 coins by market cap from CoinGecko and writes them to
+// Fetches the top 50 coins by market cap from CoinGecko and writes them to
 // the path given as the first CLI arg. There's no default path, so it never
 // overwrites a file unless told which one.
 import { writeFile, rename } from "node:fs/promises";
@@ -6,7 +6,7 @@ import path from "node:path";
 
 const COINGECKO_URL =
   "https://api.coingecko.com/api/v3/coins/markets" +
-  "?vs_currency=usd&order=market_cap_desc&per_page=20&page=1&sparkline=false";
+  "?vs_currency=usd&order=market_cap_desc&per_page=50&page=1&sparkline=false";
 
 if (!process.argv[2]) {
   throw new Error("Usage: node scripts/fetch-coins.mjs <output-path>");

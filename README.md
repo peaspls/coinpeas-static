@@ -1,6 +1,6 @@
 # CoinPeas Static
 
-A small, serverless site showing the top 20 cryptocurrencies by market cap, hosted entirely on Cloudflare.
+A small, serverless site showing the top 50 cryptocurrencies by market cap, hosted entirely on Cloudflare.
 
 Built for lightweight network use, where every kilobyte counts: no frameworks, no trackers, no unnecessary requests — just the data, built with efficiency in mind.
 
@@ -80,7 +80,7 @@ Once the two required secrets are set, the next scheduled run (or a manual one v
 On each run, `.github/workflows/deploy.yml`:
 
 1. Checks out the repo.
-2. `npm run fetch-coins` — fetches the top 20 coins from CoinGecko (with a timeout and retries) and overwrites `data/coins.json`, trimmed to just the fields the frontend renders. This runs *before* the build, since Vite reads `data/coins.json` at build time to inline it into `index.html`.
+2. `npm run fetch-coins` — fetches the top 50 coins from CoinGecko (with a timeout and retries) and overwrites `data/coins.json`, trimmed to just the fields the frontend renders. This runs *before* the build, since Vite reads `data/coins.json` at build time to inline it into `index.html`.
 3. `npm ci` + `npm run build` (Vite) — rebuilds `dist/` from scratch on every run, since the coin data (and therefore the build output) changes on almost every run.
 4. `wrangler deploy` uploads `dist/` as a new `coinpeas` version.
 
