@@ -96,7 +96,7 @@ The workflow has no GitHub `schedule:` trigger, since those can start late or sk
 }
 ```
 
-That's ten past every third hour (00:10, 03:10, 06:10, …), in UTC. It's deliberately off the top of the hour, when cron schedulers are busiest. Each run's deploy message in Cloudflare reads "GitHub Actions (scheduled by Cloudflare Worker coinpeas-cron) deploy", so you can tell these runs apart from manual ones.
+That's ten past every third hour (00:10, 03:10, 06:10, …), in UTC. It's deliberately off the top of the hour, when cron schedulers are busiest. Each run's deploy message in Cloudflare reads "Cloudflare coinpeas-cron → GitHub Actions #<run>", so you can tell these runs apart from manual ones.
 
 One-time setup:
 

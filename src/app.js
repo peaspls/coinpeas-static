@@ -60,7 +60,8 @@ function renderShell() {
               ${INFO_ICON}
             </button>
             <div id="updated-info-popover" class="info-popover" role="tooltip" hidden>
-              Data updates about every three hours, usually shortly after ten past the hour (UTC). Reload the page to see the latest.
+              <strong class="info-title">Next update around <span id="next-update"></span></strong>
+              Fresh prices arrive about every three hours. Reload then to see them.
             </div>
           </div>
         </div>
@@ -116,6 +117,7 @@ const ELEMENT_IDS = {
   updatedAt: "updated-at",
   updatedInfoBtn: "updated-info-btn",
   updatedInfoPopover: "updated-info-popover",
+  nextUpdate: "next-update",
   footer: "site-footer",
 };
 
@@ -322,7 +324,23 @@ function initRetry() {
 
 // ---------- Updated-info popover ----------
 
+// The data updates every three hours at ten past the hour (UTC): 00:10,
+// 03:10, 06:10, … Returns the first of those after `now`.
+function nextUpdateAfter(now) {
+  const next = new Date(now);
+  next.setUTCHours(next.getUTCHours() - (next.getUTCHours() % 3), 10, 0, 0);
+  while (next <= now) next.setUTCHours(next.getUTCHours() + 3);
+  return next;
+}
+
 function setInfoPopoverOpen(open) {
+  if (open) {
+    els.nextUpdate.textContent = nextUpdateAfter(new Date()).toLocaleTimeString("en-US", {
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: false,
+    });
+  }
   els.updatedInfoBtn.setAttribute("aria-expanded", String(open));
   els.updatedInfoPopover.hidden = !open;
 }

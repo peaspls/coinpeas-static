@@ -106,7 +106,8 @@ body {
     opacity: 1;
   }
 
-  .twinkle {
+  .twinkle,
+  .info-popover {
     animation: none;
   }
 }
@@ -273,20 +274,51 @@ body {
 
 .info-popover {
   position: absolute;
-  top: calc(100% + 6px);
-  right: 0;
+  top: calc(100% + 10px);
+  right: -8px;
   z-index: 10;
-  max-width: 220px;
-  padding: 8px 10px;
+  width: max-content;
+  max-width: 240px;
+  padding: 10px 14px;
   border: 1px solid var(--border);
-  border-radius: 8px;
+  border-radius: 10px;
   background: var(--surface);
-  color: var(--text);
+  color: var(--text-muted);
   font-size: 0.8125rem;
-  line-height: 1.35;
+  line-height: 1.45;
   box-shadow: var(--shadow);
   white-space: normal;
+  text-wrap: pretty;
   text-align: left;
+  animation: popover-in 0.15s ease-out;
+
+  /* A small pointer up to the info button. */
+  &::before {
+    content: "";
+    position: absolute;
+    top: -6px;
+    right: 12px;
+    width: 10px;
+    height: 10px;
+    border: solid var(--border);
+    border-width: 1px 0 0 1px;
+    background: inherit;
+    transform: rotate(45deg);
+  }
+}
+
+.info-title {
+  display: block;
+  margin-bottom: 2px;
+  color: var(--text);
+  font-weight: 500;
+}
+
+@keyframes popover-in {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
 }
 
 .retry-btn {
