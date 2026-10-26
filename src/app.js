@@ -145,6 +145,15 @@ function applyTheme(pref) {
   });
 }
 
+function chooseTheme(choice) {
+  applyTheme(choice);
+  try {
+    localStorage.setItem(THEME_STORAGE_KEY, choice);
+  } catch (e) {
+    /* ignore persistence failures (private browsing, etc.) */
+  }
+}
+
 function initTheme() {
   let pref = "system";
   try {
@@ -155,15 +164,7 @@ function initTheme() {
   applyTheme(pref);
 
   els.themeBtns.forEach((btn) => {
-    btn.addEventListener("click", () => {
-      const choice = btn.dataset.themeChoice;
-      applyTheme(choice);
-      try {
-        localStorage.setItem(THEME_STORAGE_KEY, choice);
-      } catch (e) {
-        /* ignore persistence failures (private browsing, etc.) */
-      }
-    });
+    btn.addEventListener("click", () => chooseTheme(btn.dataset.themeChoice));
   });
 
   darkSchemeQuery.addEventListener("change", () => {
@@ -369,6 +370,22 @@ function initInfoPopover() {
   });
 }
 
+// ---------- Footer scene ----------
+// Clicking the sun brings the night (dark theme) and the moon brings the day
+// (light theme), like the theme buttons; clicking the tree moves on to the
+// next season until the page is reloaded.
+
+const SEASONS = ["spring", "summer", "autumn", "winter"];
+
+function initFooterScene() {
+  els.footer.querySelector(".sun").addEventListener("click", () => chooseTheme("dark"));
+  els.footer.querySelector(".moon").addEventListener("click", () => chooseTheme("light"));
+  els.footer.querySelector(".footer-tree").addEventListener("click", () => {
+    const current = SEASONS.indexOf(root.getAttribute("data-season"));
+    root.setAttribute("data-season", SEASONS[(current + 1) % SEASONS.length]);
+  });
+}
+
 function init() {
   document.getElementById("app").innerHTML = renderShell();
   queryEls();
@@ -376,6 +393,7 @@ function init() {
   initTheme();
   initRetry();
   initInfoPopover();
+  initFooterScene();
   loadCoins();
 }
 

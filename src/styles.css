@@ -576,6 +576,10 @@ body {
   fill: #e9b350;
 }
 
+.footer-scene :is(.sun, .moon, .footer-tree) {
+  cursor: pointer;
+}
+
 .twinkle {
   animation: twinkle 4s ease-in-out infinite alternate;
 }

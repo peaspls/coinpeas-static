@@ -44,7 +44,7 @@ export const INFO_ICON = `
 const SNOW_BRANCHES = "M159 80c-8-4-18-9-26-20M161 80c8-4 18-9 26-20M159 72c-5-6-11-14-14-26M161 72c5-6 11-14 14-26M140 66c-5-1-9-4-11-8M180 66c5-1 9-4 11-8";
 
 // The sky, around the tree. By day a sun in a warm tint (.sun); at night, in
-// its place, a crescent moon, a few stars and one star that twinkles.
+// its place, a crescent moon (.moon), a few stars and one star that twinkles.
 const SUN_DISC = "M283 20a5 5 0 1 0 10 0 5 5 0 1 0-10 0";
 const SUN_RAYS = "M295.5 20l2.5 0M293.3 25.3l1.8 1.8M288 27.5l0 2.5M282.7 25.3l-1.8 1.8M280.5 20l-2.5 0M282.7 14.7l-1.8 -1.8M288 12.5l0 -2.5M293.3 14.7l1.8 -1.8";
 const MOON = "M286 13a8 8 0 1 0 8 12.5 6.5 6.5 0 1 1-8-12.5z";
@@ -101,6 +101,12 @@ const LEAVES_ALT = "M168 19.7q4.2 4 0 8q-4.2-4 0-8M186 47.3q4.2 4 0 8q-4.2-4 0-8
 
 const SOFT = 'fill="currentColor" fill-opacity=".15"';
 
+// Invisible shapes that give the sun, the moon and the tree a click target
+// larger than their thin lines.
+const HIT = 'fill="transparent" stroke="none"';
+const SKY_HIT = `<circle cx="288" cy="20" r="14" ${HIT}/>`;
+const TREE_HIT = `<ellipse cx="160" cy="48" rx="52" ry="40" ${HIT}/><rect x="150" y="80" width="20" height="33" ${HIT}/>`;
+
 // A pose: soft-filled shapes, then lines.
 const pose = ([soft, lines], extra = "") => `<path d="${soft}" ${SOFT}/><path d="${lines}"/>${extra}`;
 
@@ -111,9 +117,9 @@ export const FOOTER_SCENE_SVG = `<svg class="footer-scene" viewBox="-80 0 480 13
   `<g class="summer-plants"><path d="${SUMMER_SOFT}" ${SOFT}/><path d="${SUMMER_LINES}"/></g>` +
   `<g transform="translate(-293 56)"><path d="${RABBIT_BODY}" ${SOFT}/><path d="${RABBIT_TAIL}"/>${poses(pose(RABBIT_AWAKE), pose(RABBIT_ASLEEP))}</g>` +
   `<g transform="translate(-244 56)">${poses(pose(CAT_AWAKE), pose(CAT_ASLEEP, CAT_ZZ.map((d) => `<path class="zz" d="${d}"/>`).join("")))}</g>` +
-  `<g class="day-sky sun"><path d="${SUN_DISC}" fill-opacity=".3"/><path d="${SUN_RAYS}"/></g>` +
-  `<g class="night-sky"><path d="${MOON}" ${SOFT}/><path d="${STARS}"/><path class="twinkle" d="${TWINKLE}"/></g>` +
-  `<g class="footer-tree"><path d="${TRUNK}" ${SOFT}/><path d="${BRANCHES}"/><path d="${SNOW_BRANCHES}" transform="translate(0 -1.4)" stroke="var(--snow)" stroke-width="1.6"/>` +
+  `<g class="day-sky sun">${SKY_HIT}<path d="${SUN_DISC}" fill-opacity=".3"/><path d="${SUN_RAYS}"/></g>` +
+  `<g class="night-sky"><g class="moon">${SKY_HIT}<path d="${MOON}" ${SOFT}/></g><path d="${STARS}"/><path class="twinkle" d="${TWINKLE}"/></g>` +
+  `<g class="footer-tree">${TREE_HIT}<path d="${TRUNK}" ${SOFT}/><path d="${BRANCHES}"/><path d="${SNOW_BRANCHES}" transform="translate(0 -1.4)" stroke="var(--snow)" stroke-width="1.6"/>` +
   `<g transform="translate(626.8 31.9) scale(-0.75 0.75)">${poses(pose(BIRD_AWAKE), pose(BIRD_ASLEEP))}</g>` +
   `<path class="leaves" d="${LEAVES}" fill-opacity=".3"/>` +
   `<path class="leaves-alt" d="${LEAVES_ALT}" fill-opacity=".3"/></g></svg>`;
