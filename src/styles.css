@@ -18,31 +18,30 @@
 
 :root {
   color-scheme: light dark;
-  --bg: light-dark(#f7f5ee, #12180f);
-  --surface: light-dark(#ffffff, #1a2317);
-  --surface-alt: light-dark(#f0ece1, #202b1c);
-  --primary: light-dark(#24603f, #8fd0a2);
-  --primary-strong: light-dark(#17422b, #b6e6c3);
+  --bg: light-dark(#fbf6f0, #0c0f17);
+  --surface: light-dark(#ffffff, #161916);
+  --surface-alt: light-dark(#e5ebe3, #1b1e1b);
+  --primary: light-dark(#1d6a3c, #8fd0a2);
+  --primary-strong: light-dark(#123f24, #b6e6c3);
   --secondary: light-dark(#7c9a7e, #7fa583);
-  --text: light-dark(#23281f, #e7ecdf);
-  --text-muted: light-dark(#5b6156, #a3ad99);
-  --border: light-dark(#e2ddca, #2a3524);
+  --text: light-dark(#141813, #eef0ec);
+  --text-muted: light-dark(#3d433a, #b6bcb2);
+  --border: light-dark(#e3e7e1, #272b26);
   --positive: light-dark(#2f7d4f, #7fd39a);
   --negative: light-dark(#b3492f, #e08a72);
   --shadow: 0 1px 2px rgba(35, 40, 31, 0.06), 0 8px 24px rgba(35, 40, 31, 0.05);
   --shadow-dark: 0 1px 2px rgba(0, 0, 0, 0.3), 0 12px 28px rgba(0, 0, 0, 0.35);
-  --radius: 14px;
-  /* Season: the footer's ground colour, the footer tree's leaves (none in
-     winter) and, in winter, snow on the ground and branches. */
-  --footer-bg: light-dark(#3d6143, #172617);
+  --radius: 6px;
+  /* The footer's ground: dark soil, as moonlight shows it in dark mode. The
+     same in every season. */
+  --footer-bg: light-dark(#3d3029, #0e0d11);
+  /* Season: the footer tree's leaves (fewer in winter). */
   --leaf: #0000;
   --leaf2: var(--leaf);
-  --snow: #0000;
 
   &[data-season="spring"] {
     --leaf: light-dark(#e8a5b6, #d98fa4);
     --leaf2: light-dark(#9cc787, #8fc28a);
-    --footer-bg: light-dark(#406446, #19281a);
   }
 
   &[data-season="summer"] {
@@ -53,12 +52,10 @@
   &[data-season="autumn"] {
     --leaf: light-dark(#c7783a, #d9894f);
     --leaf2: light-dark(#d1a43c, #c8a855);
-    --footer-bg: light-dark(#5a5a3f, #202115);
   }
 
   &[data-season="winter"] {
-    --footer-bg: light-dark(#44605a, #182422);
-    --snow: light-dark(#fff, #c9d3d6);
+    --leaf: light-dark(#d88f78, #d98c7a);
   }
 
   &[data-theme="light"] {
@@ -81,6 +78,13 @@
   box-sizing: border-box;
 }
 
+/* A clear ring on whatever has keyboard focus, in the element's own colour
+   so it shows on any background. */
+:focus-visible {
+  outline: 3px solid currentColor;
+  outline-offset: 2px;
+}
+
 html {
   /* Reserves the scrollbar's width up front, so the page going from
      short (no scrollbar) to tall (scrollbar) doesn't nudge the
@@ -93,6 +97,7 @@ body {
   background: var(--bg);
   color: var(--text);
   font-family: "Inter Variable", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  line-height: 1.5;
   -webkit-font-smoothing: antialiased;
 }
 
@@ -121,16 +126,17 @@ body {
 .page {
   flex: 1;
   width: 100%;
-  max-width: 920px;
+  max-width: 57.5rem;
   margin: 0 auto;
   padding: 28px 20px 0;
 }
 
 .site-header {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
-  gap: 16px;
+  gap: 12px 16px;
   padding-bottom: 20px;
 }
 
@@ -212,15 +218,15 @@ body {
 
 .panel {
   /* Intentionally its own, slightly softer palette — not shared with :root. */
-  --surface-alt: light-dark(#f1eee5, #2a2f29);
-  --border: light-dark(#e4e0d4, #343a33);
-  --text-secondary: light-dark(#6b7268, #a6ada1);
-  --text-muted: light-dark(#73766f, #848b80);
+  --surface-alt: light-dark(#f5f7f4, #1a1d1a);
+  --border: light-dark(#e6e9e4, #262a25);
+  --text-secondary: light-dark(#3d443b, #bac0b5);
+  --text-muted: light-dark(#474e45, #a8afa5);
   --primary: light-dark(#6b8e63, #8fb586);
   --primary-strong: light-dark(#4a6444, #a9cba1);
   --accent-soft: light-dark(#e6eee2, #2c3a2a);
-  --positive: light-dark(#5e7d57, #8fb586);
-  --negative: light-dark(#a3664e, #d79379);
+  --positive: light-dark(#1a5c35, #8fc29a);
+  --negative: light-dark(#8f321e, #eba58f);
 
   background: var(--surface);
   border: 1px solid var(--border);
@@ -243,7 +249,7 @@ body {
 }
 
 .updated-at {
-  font-size: 0.875rem;
+  font-size: 0.9375rem;
   color: var(--text-muted);
 }
 
@@ -255,8 +261,8 @@ body {
 }
 
 .info-btn {
-  width: 18px;
-  height: 18px;
+  width: 24px;
+  height: 24px;
   padding: 0;
   border-radius: 50%;
   color: var(--text-muted);
@@ -264,11 +270,6 @@ body {
   &:hover,
   &[aria-expanded="true"] {
     color: var(--text);
-  }
-
-  &:focus-visible {
-    outline: 2px solid var(--primary);
-    outline-offset: 2px;
   }
 }
 
@@ -278,14 +279,14 @@ body {
   right: -8px;
   z-index: 10;
   width: max-content;
-  max-width: 240px;
-  padding: 10px 14px;
+  max-width: 280px;
+  padding: 12px 16px;
   border: 1px solid var(--border);
   border-radius: 10px;
   background: var(--surface);
   color: var(--text-muted);
-  font-size: 0.8125rem;
-  line-height: 1.45;
+  font-size: 0.9375rem;
+  line-height: 1.5;
   box-shadow: var(--shadow);
   white-space: normal;
   text-wrap: pretty;
@@ -326,8 +327,8 @@ body {
   background: var(--surface-alt);
   color: var(--text);
   border-radius: 8px;
-  padding: 6px 12px;
-  font-size: 0.82rem;
+  padding: 8px 14px;
+  font-size: 0.9375rem;
   cursor: pointer;
 
   &:hover {
@@ -368,9 +369,8 @@ body {
   }
 
   th {
-    font-size: 0.72rem;
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
+    font-size: 0.875rem;
+    font-weight: 600;
     color: var(--text-muted);
   }
 
@@ -395,21 +395,21 @@ body {
   }
 }
 
-.col-rank,
-.col-change {
-  font-size: 0.8125rem;
+.col-rank {
+  font-size: 0.875rem;
 }
 
 .col-price,
+.col-change,
 .col-marketcap {
-  font-size: 0.844rem;
+  font-size: 0.9375rem;
 }
 
-/* Just wide enough for the cell's left padding and a two-digit rank; the
-   coin column's own padding keeps the gap, and it takes whatever width the
-   other columns leave. */
+/* Just wide enough for the cell's left padding and a two-digit rank at any
+   text size; the coin column's own padding keeps the gap, and it takes
+   whatever width the other columns leave. */
 .coin-table .col-rank {
-  width: 46px;
+  width: calc(20px + 1.6rem);
   padding-right: 0;
   color: var(--text-muted);
   text-overflow: clip;
@@ -447,21 +447,23 @@ body {
   overflow: hidden;
 }
 
+/* Long names and symbols wrap rather than being cut off. */
 .coin-name {
   display: block;
-  font-size: 0.906rem;
+  font-size: 1rem;
   font-weight: 500;
   color: var(--text);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  white-space: normal;
+  overflow-wrap: anywhere;
 }
 
 .coin-symbol {
   display: block;
   color: var(--text-muted);
-  font-size: 0.75rem;
+  font-size: 0.875rem;
   text-transform: uppercase;
+  white-space: normal;
+  overflow-wrap: anywhere;
 }
 
 .change-positive {
@@ -477,10 +479,10 @@ body {
   position: relative;
   isolation: isolate;
   overflow-x: clip;
-  --text-muted: light-dark(#ffffffcc, #ffffff9e);
-  margin-top: 120px;
+  --text-muted: light-dark(#ffffff, #e9eee5);
+  margin-top: 168px;
   padding: 28px 20px 14px;
-  color: light-dark(#f3f5ef, #e2e7dc);
+  color: light-dark(#ffffff, #e9eee5);
   text-align: center;
 
   /* The ground itself: wider than the footer (and at least 1400px wide), so
@@ -493,16 +495,13 @@ body {
     inset: 0 min(-25%, 50% - 700px);
     z-index: -1;
     border-radius: 50% 50% 0 0 / 40px 40px 0 0;
-    background: linear-gradient(#ffffff0d, #0000 60%), var(--footer-bg);
-    /* A layer of snow along the crest. */
-    box-shadow: inset 0 3px var(--snow);
+    background: var(--footer-bg);
   }
 }
 
-/* Stands centred on the hill's crest. --ground matches the top of the band
-   (its colour under the gradient), so the mound at the scene's foot merges
-   into the hill; the lines are the band's colour, lifted in dark mode so they
-   stay visible. */
+/* Stands centred on the hill's crest. The mound at the scene's foot is the
+   band's colour, so it merges into the hill; the lines are the band's colour
+   too, lifted in dark mode so they stay visible. */
 .footer-scene {
   display: block;
   position: absolute;
@@ -510,18 +509,54 @@ body {
   left: calc(50% - 240px);
   width: 480px;
   height: 130px;
-  --ground: color-mix(in srgb, var(--footer-bg), #fff 5%);
   color: light-dark(var(--footer-bg), color-mix(in srgb, var(--footer-bg), #fff 35%));
 }
 
-/* Plants follow the season: none in winter, more in summer. */
+/* Winter's bird feeder, softened by moonlight at night. */
+.winter-only {
+  display: none;
+
+  [data-season="winter"] & {
+    display: inline;
+  }
+}
+
+.feeder {
+  color: light-dark(#7a5a3c, #8a8790);
+}
+
+.feeder-house {
+  fill: currentColor;
+  fill-opacity: 0.25;
+}
+
+/* Plants follow the season: none in winter, tulips in spring, asters in
+   autumn, and everything in summer. */
 .summer-plants,
+.spring-plants,
+.autumn-plants,
 [data-season="winter"] .plants {
   display: none;
 }
 
-[data-season="summer"] .summer-plants {
+[data-season="spring"] .spring-plants,
+[data-season="autumn"] .autumn-plants,
+[data-season="summer"] :is(.summer-plants, .spring-plants, .autumn-plants) {
   display: inline;
+}
+
+/* The rabbit, the cat and the bird are white, a soft moonlit white in
+   dark mode. */
+.fur {
+  fill: light-dark(#ffffff, #c3c9d2);
+}
+
+/* Grass, sprouts and stems are green, muted by moonlight in dark mode. */
+.plants,
+.summer-plants,
+.spring-plants,
+.autumn-plants {
+  color: light-dark(#3f7a46, #7c847f);
 }
 
 /* Behind the hill, so the hill covers whatever of it lies below the crest. */
@@ -539,19 +574,42 @@ body {
   --tone: var(--leaf2);
 }
 
+/* Flower colours, coloured like the leaves (and muted the same way at
+   night). */
+.tulip {
+  --tone: light-dark(#d4566f, #d96a80);
+}
+
+.aster {
+  --tone: light-dark(#7d5fc0, #9a82d6);
+}
+
+.aster-centre {
+  --tone: light-dark(#d9a02c, #e0b456);
+}
+
 .leaves,
-.leaves-alt {
+.leaves-alt,
+.bloom {
   stroke: var(--tone);
   fill: var(--tone);
 
   [data-theme="dark"] & {
-    stroke: color-mix(in srgb, var(--tone) 35%, currentColor);
-    fill: color-mix(in srgb, var(--tone) 35%, currentColor);
+    stroke: color-mix(in srgb, var(--tone) 15%, currentColor);
+    fill: color-mix(in srgb, var(--tone) 15%, currentColor);
   }
+}
 
-  [data-season="winter"] & {
-    display: none;
-  }
+/* How full the crown is follows the year: sparse in winter (one colour
+   only), full in spring and autumn, and fullest in summer (with extra
+   leaves). */
+[data-season="winter"] .leaves-alt,
+.summer-only {
+  display: none;
+}
+
+[data-season="summer"] .summer-only {
+  display: inline;
 }
 
 .footer-tree {
@@ -582,6 +640,10 @@ body {
 
 .twinkle {
   animation: twinkle 4s ease-in-out infinite alternate;
+
+  & + & {
+    animation-delay: -2s;
+  }
 }
 
 @keyframes twinkle {
@@ -621,7 +683,7 @@ body {
 
 .attribution,
 .site-footer p {
-  font-size: 0.875rem;
+  font-size: 0.9375rem;
 }
 
 .attribution {
@@ -650,7 +712,9 @@ body {
   vertical-align: -5px;
 }
 
-@media (max-width: 640px) {
+/* Breakpoints are in em, so a larger default text size moves to the
+   roomier layouts sooner, just as a narrower screen does. */
+@media (max-width: 40em) {
   .page {
     padding: 20px 14px 0;
   }
@@ -659,16 +723,19 @@ body {
     display: none;
   }
 
+  /* Price and change take exactly the width their figures need, so
+     they're never cut off; the coin column gets the rest. */
+  .coin-table {
+    table-layout: auto;
+  }
+
   .coin-table .col-rank {
-    width: 34px;
+    width: calc(10px + 1.5rem);
   }
 
-  .col-price {
-    width: 30%;
-  }
-
+  .col-price,
   .col-change {
-    width: 26%;
+    width: 1%;
   }
 
   .coin-table th,
@@ -681,28 +748,85 @@ body {
   }
 }
 
-@media (max-width: 460px) {
+@media (max-width: 28.75em) {
   .coin-table th,
   .coin-table td {
     padding: 10px 12px;
   }
 
   .coin-table .col-rank {
-    width: 36px;
+    width: calc(12px + 1.5rem);
   }
 }
 
-@media (max-width: 380px) {
+@media (max-width: 23.75em) {
   .coin-table th,
   .coin-table td {
     padding: 10px 8px;
   }
 
   .coin-table .col-rank {
-    width: 32px;
+    width: calc(8px + 1.5rem);
+  }
+}
+
+/* Copies of the 24h change (under the price) and of the price and change
+   (under the coin name), shown only in the narrowest layouts below. */
+.stacked-change,
+.stacked-price {
+  display: none;
+}
+
+/* With very little room (a small phone, or a large text size), the 24h
+   change moves under the price and its own column goes, leaving the coin
+   column room for whole names. */
+@media (max-width: 22em) {
+  .col-change {
+    display: none;
   }
 
+  td .stacked-change {
+    display: block;
+    font-weight: 500;
+  }
+
+  th .stacked-change {
+    display: inline;
+  }
+}
+
+/* With even less room (only at very large text sizes), price and change
+   move under the coin name too, so each row reads top to bottom. */
+@media (max-width: 15em) {
   .col-price {
-    width: 34%;
+    display: none;
+  }
+
+  td .stacked-price {
+    display: block;
+    margin-top: 2px;
+    white-space: normal;
+    font-size: 0.9375rem;
+    font-weight: 500;
+    color: var(--text);
+  }
+
+  th .stacked-price {
+    display: inline;
+  }
+
+  .coin-table th {
+    white-space: normal;
+  }
+}
+
+/* When the system asks for more contrast: every text at full strength and
+   firmer borders. */
+@media (prefers-contrast: more) {
+  :root,
+  .panel {
+    --text-muted: var(--text);
+    --text-secondary: var(--text);
+    --border: light-dark(#7c8379, #7f877c);
   }
 }

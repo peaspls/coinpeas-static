@@ -77,8 +77,8 @@ function renderShell() {
               <thead>
                 <tr>
                   <th class="col-rank">#</th>
-                  <th class="col-coin">Coin</th>
-                  <th class="col-price">Price</th>
+                  <th class="col-coin">Coin<span class="stacked-price"> · Price · 24h</span></th>
+                  <th class="col-price">Price<span class="stacked-change"> · 24h</span></th>
                   <th class="col-change">24h</th>
                   <th class="col-marketcap">Market Cap</th>
                 </tr>
@@ -208,10 +208,12 @@ function formatCompactUSD(value) {
   return usdCompact.format(value);
 }
 
+// Falls use a true minus sign (−), which is as wide as the plus and easier
+// to tell from it than a hyphen.
 function formatChange(value) {
   if (value == null) return PLACEHOLDER;
-  const sign = value > 0 ? "+" : "";
-  return sign + value.toFixed(2) + "%";
+  const sign = value > 0 ? "+" : value < 0 ? "−" : "";
+  return sign + Math.abs(value).toFixed(2) + "%";
 }
 
 const HTML_ESCAPES = { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" };
@@ -251,10 +253,11 @@ function renderRows(coins) {
             <span class="coin-label">
               <span class="coin-name" title="${name}">${name}</span>
               <span class="coin-symbol" title="${symbol}">${symbol}</span>
+              <span class="stacked-price">${formatPrice(coin.current_price)} <span class="${changeClass}">${formatChange(change)}</span></span>
             </span>
           </div>
         </td>
-        <td class="col-price">${formatPrice(coin.current_price)}</td>
+        <td class="col-price">${formatPrice(coin.current_price)}<span class="stacked-change ${changeClass}">${formatChange(change)}</span></td>
         <td class="col-change ${changeClass}">${formatChange(change)}</td>
         <td class="col-marketcap">${formatCompactUSD(coin.market_cap)}</td>
       </tr>`;
