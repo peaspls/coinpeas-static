@@ -112,7 +112,10 @@ body {
   }
 
   .twinkle,
-  .info-popover {
+  .info-popover,
+  .rabbit .awake .fur,
+  .cat-tail,
+  .bird .awake {
     animation: none;
   }
 }
@@ -691,6 +694,74 @@ body {
   to {
     opacity: 0;
     transform: translate(1px, -4px);
+  }
+}
+
+/* Now and then, by day, a small sign of life: the rabbit twitches its ears,
+   the cat flicks its tail and the bird hops. Each lasts under a second, on
+   its own rhythm, so they rarely move at once. */
+.rabbit .awake .fur {
+  transform-box: fill-box;
+  transform-origin: 90% 90%;
+  animation: ear-twitch 7s infinite;
+}
+
+.cat-tail {
+  transform-box: fill-box;
+  transform-origin: 0 100%;
+  animation: tail-flick 11s -4s infinite;
+}
+
+.bird .awake {
+  animation: hop 13s -6s infinite;
+}
+
+@keyframes ear-twitch {
+  0%,
+  92%,
+  100% {
+    rotate: 0deg;
+  }
+  94% {
+    rotate: -9deg;
+  }
+  96% {
+    rotate: 3deg;
+  }
+  98% {
+    rotate: -4deg;
+  }
+}
+
+@keyframes tail-flick {
+  0%,
+  88%,
+  100% {
+    rotate: 0deg;
+  }
+  91% {
+    rotate: -16deg;
+  }
+  94% {
+    rotate: 6deg;
+  }
+  97% {
+    rotate: -6deg;
+  }
+}
+
+@keyframes hop {
+  0%,
+  90%,
+  96%,
+  100% {
+    translate: 0 0;
+  }
+  93% {
+    translate: 0 -4px;
+  }
+  97.5% {
+    translate: 0 -2px;
   }
 }
 

@@ -81,8 +81,10 @@ const RABBIT_ASLEEP = [
 
 const CAT_AWAKE = [
   "M476 43.5C470 45 469 52 470.5 57H489.5C491 52 490 45 484 43.5ZM473.5 38.5C473.5 35.5 474 33 475 30.5L478.5 33C479.5 32.8 480.5 32.8 481.5 33L485 30.5C486 33 486.5 35.5 486.5 38.5 486.5 42 483.5 44.2 480 44.2 476.5 44.2 473.5 42 473.5 38.5Z",
-  "M479 41.3q.5.6 1 0 .5.6 1 0M489.5 56c6 1 9-4 6-8M477 57v-3M483 57v-3M480 40.3h0M476.3 38.4q1.2-1.1 2.4 0M481.3 38.4q1.2-1.1 2.4 0",
+  "M479 41.3q.5.6 1 0 .5.6 1 0M477 57v-3M483 57v-3M480 40.3h0M476.3 38.4q1.2-1.1 2.4 0M481.3 38.4q1.2-1.1 2.4 0",
 ];
+// Its own path so it can flick now and then.
+const CAT_TAIL = "M489.5 56c6 1 9-4 6-8";
 // Curled up: head resting on the ground in front, tail wrapped round the
 // body, eyes shut.
 const CAT_ASLEEP = [
@@ -131,12 +133,12 @@ export const FOOTER_SCENE_SVG = `<svg class="footer-scene" viewBox="-80 0 480 13
   `<g class="summer-plants"><path d="${SUMMER_SOFT}" ${SOFT}/><path d="${SUMMER_LINES}"/></g>` +
   `<g class="spring-plants"><path d="${SPRING_LINES}"/><path class="bloom tulip" d="${TULIPS}" fill-opacity=".5"/></g>` +
   `<g class="autumn-plants"><path d="${AUTUMN_LINES}"/><path class="bloom aster" d="${ASTER_PETALS}"/><path class="bloom aster-centre" d="${ASTER_CENTRES}" stroke-width="2.4"/></g>` +
-  `<g transform="translate(-293 56)"><path class="fur" d="${RABBIT_BODY}"/><path d="${RABBIT_TAIL}"/>${poses(pose(RABBIT_AWAKE), pose(RABBIT_ASLEEP))}</g>` +
-  `<g transform="translate(-244 56)">${poses(pose(CAT_AWAKE), pose(CAT_ASLEEP, CAT_ZZ.map((d) => `<path class="zz" d="${d}"/>`).join("")))}</g>` +
+  `<g class="rabbit" transform="translate(-293 56)"><path class="fur" d="${RABBIT_BODY}"/><path d="${RABBIT_TAIL}"/>${poses(pose(RABBIT_AWAKE), pose(RABBIT_ASLEEP))}</g>` +
+  `<g class="cat" transform="translate(-244 56)">${poses(pose(CAT_AWAKE, `<path class="cat-tail" d="${CAT_TAIL}"/>`), pose(CAT_ASLEEP, CAT_ZZ.map((d) => `<path class="zz" d="${d}"/>`).join("")))}</g>` +
   `<g class="day-sky sun">${SKY_HIT}<path d="${SUN_DISC}" fill-opacity=".3"/><path d="${SUN_RAYS}"/></g>` +
   `<g class="night-sky"><g class="moon">${SKY_HIT}<path d="${MOON}" ${SOFT}/></g><path d="${STARS}"/>${TWINKLES.map((d) => `<path class="twinkle" d="${d}"/>`).join("")}</g>` +
   `<g class="footer-tree">${TREE_HIT}<path d="${TRUNK}" ${SOFT}/><path d="${BRANCHES}"/>` +
-  `<g transform="translate(626.8 31.9) scale(-0.75 0.75)">${poses(pose(BIRD_AWAKE), pose(BIRD_ASLEEP))}</g>` +
+  `<g class="bird" transform="translate(626.8 31.9) scale(-0.75 0.75)">${poses(pose(BIRD_AWAKE), pose(BIRD_ASLEEP))}</g>` +
   `<g class="winter-only">${FEEDER}</g>` +
   `<path class="leaves" d="${LEAVES}" fill-opacity=".3"/>` +
   `<path class="leaves-alt" d="${LEAVES_ALT}" fill-opacity=".3"/>` +
