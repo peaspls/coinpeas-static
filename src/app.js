@@ -10,6 +10,7 @@ import {
   INFO_ICON,
   FOOTER_SCENE_SVG,
   FOOTER_MOUND_SVG,
+  FOOTER_SKY_SVG,
 } from "./icons.js";
 
 const THEME_STORAGE_KEY = "coinpeas-theme";
@@ -95,6 +96,7 @@ function renderShell() {
     </div>
 
     <footer id="site-footer" class="site-footer" hidden>
+      ${FOOTER_SKY_SVG}
       ${FOOTER_MOUND_SVG}
       ${FOOTER_SCENE_SVG}
       <p>

@@ -143,6 +143,26 @@ export const FOOTER_SCENE_SVG = `<svg class="footer-scene" viewBox="-80 0 480 13
   `<path class="leaves summer-only" d="${SUMMER_LEAVES}" fill-opacity=".3"/>` +
   `<path class="leaves-alt summer-only" d="${SUMMER_LEAVES_ALT}" fill-opacity=".3"/></g></svg>`;
 
+// The night sky across the full width of wide screens: stars scattered from
+// a fixed seed, so they're the same on every visit, thinning out toward the
+// edges and leaving the scene's own patch of sky to the scene.
+function skyStars() {
+  let seed = 7;
+  const random = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+  const stars = [];
+  for (let tries = 0; stars.length < 150 && tries < 20000; tries++) {
+    const x = random() * 1920 - 960;
+    const y = random() * 190;
+    if ((Math.abs(x) < 245 && y > 75) || random() < Math.abs(x) / 1400) continue;
+    if (stars.every(([a, b]) => (a - x) ** 2 + (b - y) ** 2 > 26 ** 2)) {
+      stars.push([Math.round(x), Math.round(y)]);
+    }
+  }
+  return stars.map(([x, y]) => `M${x} ${y}h0`).join("");
+}
+
+export const FOOTER_SKY_SVG = `<svg class="footer-sky" viewBox="-960 0 1920 190" aria-hidden="true"><path d="${skyStars()}"/></svg>`;
+
 // The low mound the scene stands on: flat where it stands, tapering off to
 // either side. Drawn on the same grid as the scene but behind the footer's
 // hill, so only the part rising above the crest shows.
