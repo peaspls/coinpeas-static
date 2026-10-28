@@ -106,6 +106,7 @@ function renderShell() {
         <span class="footer-mark" aria-hidden="true">${BRAND_MARK_SVG}</span>
         Give peas a chance. A <a class="footer-link" href="https://github.com/peaspls" target="_blank" rel="noopener">peaspls</a> project · <a class="footer-link" href="https://github.com/peaspls/coinpeas-static" target="_blank" rel="noopener">View source on GitHub</a>
       </p>
+      <p class="footer-hint">Follow the white rabbit.</p>
     </footer>`;
 }
 

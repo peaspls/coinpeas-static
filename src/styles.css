@@ -659,8 +659,19 @@ body {
   fill: #e9b350;
 }
 
-.footer-scene :is(.sun, .moon, .footer-tree) {
+.footer-scene :is(.sun, .moon, .footer-tree, .rabbit-link) {
   cursor: pointer;
+}
+
+/* The rabbit is a link for the mouse only, so it never shows a focus box or
+   a tap highlight when clicked. */
+.rabbit-link {
+  -webkit-tap-highlight-color: transparent;
+
+  &:focus,
+  &:focus-visible {
+    outline: none;
+  }
 }
 
 .twinkle {
@@ -796,7 +807,7 @@ body {
   text-decoration: underline;
 }
 
-.site-footer .footer-tagline {
+.site-footer :is(.footer-tagline, .footer-hint) {
   margin-top: 8px;
 }
 

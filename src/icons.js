@@ -94,10 +94,6 @@ const CAT_ASLEEP = [
 // Two small z's rising from the sleeping cat's head.
 const CAT_ZZ = ["M477 38h2.5l-2.5 2.5h2.5", "M481 30h3.5l-3.5 3.5h3.5"];
 
-// The tree sways as one, bird included.
-const TRUNK = "M152 113c4-3 6-8 6.5-16 .3-8 .5-17 .5-27h2c0 10 .2 19 .5 27 .5 8 2.5 13 6.5 16";
-const BRANCHES = "M159 80c-8-4-18-9-26-20M161 80c8-4 18-9 26-20M159 72c-5-6-11-14-14-26M161 72c5-6 11-14 14-26M160 70V30M140 66c-5-1-9-4-11-8M180 66c5-1 9-4 11-8";
-
 const BIRD_AWAKE = [
   "M611 36C609 32 602 32 601 37 596 40 590 43 584 42L588 46C592 51 606 52 610 45 612 42 612 39 611 36Z",
   "M611 36l5 2-5 1.5M596 42c4 3 8 3 10 1M600 50v3M604 50v3M607 36.5h0",
@@ -107,6 +103,10 @@ const BIRD_ASLEEP = [
   "M611 40C611 34 604 33 600 36 594 39 589 43 584 42L588 46C592 51 606 51 610 47 611 45 611 42 611 40Z",
   "M611 40l3 3-3.5.5M597 43c4 2.5 8 2.5 10 .5M600 50v3M604 50v3M605 39.6q1 .8 2 0",
 ];
+
+// The tree sways as one, bird included.
+const TRUNK = "M152 113c4-3 6-8 6.5-16 .3-8 .5-17 .5-27h2c0 10 .2 19 .5 27 .5 8 2.5 13 6.5 16";
+const BRANCHES = "M159 80c-8-4-18-9-26-20M161 80c8-4 18-9 26-20M159 72c-5-6-11-14-14-26M161 72c5-6 11-14 14-26M160 70V30M140 66c-5-1-9-4-11-8M180 66c5-1 9-4 11-8";
 
 // Leaves in two colours (.leaves, .leaves-alt), plus extra leaves that fill
 // the crown only in summer (.summer-only).
@@ -121,6 +121,9 @@ const SOFT = 'fill="currentColor" fill-opacity=".15"';
 // larger than their thin lines.
 const HIT = 'fill="transparent" stroke="none"';
 const SKY_HIT = `<circle cx="288" cy="20" r="14" ${HIT}/>`;
+// The rabbit links to the riddle, for the mouse only like the sun and the
+// tree, with its own larger hit area.
+const RABBIT_HIT = '<rect x="60" y="82" width="54" height="34" rx="8" fill="transparent" stroke="none"/>';
 const TREE_HIT = `<ellipse cx="160" cy="48" rx="52" ry="40" ${HIT}/><rect x="150" y="80" width="20" height="33" ${HIT}/>`;
 
 // An animal pose: its body (.fur, coloured by the stylesheet), then lines.
@@ -133,7 +136,7 @@ export const FOOTER_SCENE_SVG = `<svg class="footer-scene" viewBox="-80 0 480 13
   `<g class="summer-plants"><path d="${SUMMER_SOFT}" ${SOFT}/><path d="${SUMMER_LINES}"/></g>` +
   `<g class="spring-plants"><path d="${SPRING_LINES}"/><path class="bloom tulip" d="${TULIPS}" fill-opacity=".5"/></g>` +
   `<g class="autumn-plants"><path d="${AUTUMN_LINES}"/><path class="bloom aster" d="${ASTER_PETALS}"/><path class="bloom aster-centre" d="${ASTER_CENTRES}" stroke-width="2.4"/></g>` +
-  `<g class="rabbit" transform="translate(-293 56)"><path class="fur" d="${RABBIT_BODY}"/><path d="${RABBIT_TAIL}"/>${poses(pose(RABBIT_AWAKE), pose(RABBIT_ASLEEP))}</g>` +
+  `<a class="rabbit-link" href="/riddle" tabindex="-1">${RABBIT_HIT}<g class="rabbit" transform="translate(-293 56)"><path class="fur" d="${RABBIT_BODY}"/><path d="${RABBIT_TAIL}"/>${poses(pose(RABBIT_AWAKE), pose(RABBIT_ASLEEP))}</g></a>` +
   `<g class="cat" transform="translate(-244 56)">${poses(pose(CAT_AWAKE, `<path class="cat-tail" d="${CAT_TAIL}"/>`), pose(CAT_ASLEEP, CAT_ZZ.map((d) => `<path class="zz" d="${d}"/>`).join("")))}</g>` +
   `<g class="day-sky sun">${SKY_HIT}<path d="${SUN_DISC}" fill-opacity=".3"/><path d="${SUN_RAYS}"/></g>` +
   `<g class="night-sky"><g class="moon">${SKY_HIT}<path d="${MOON}" ${SOFT}/></g><path d="${STARS}"/>${TWINKLES.map((d) => `<path class="twinkle" d="${d}"/>`).join("")}</g>` +

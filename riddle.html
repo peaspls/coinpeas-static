@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>A riddle — CoinPeas</title>
+  <meta name="description" content="Two small puzzles in the friends' room." />
+  <link rel="icon" href="/src/favicon.svg" type="image/svg+xml" />
+  <link rel="preload" href="/fonts/inter-variable-latin.woff2" as="font" type="font/woff2" crossorigin />
+</head>
+<body>
+  <main class="page">
+    <h1 class="sr-only">The friends' room: two little puzzles</h1>
+    <div class="stage">
+      <div id="room"></div>
+      <div id="actions" class="actions" hidden>
+        <div class="card">
+          <p>The cat would like to play with you.</p>
+          <div class="buttons">
+            <a class="button" href="/game">Play with cat</a>
+            <button id="end" class="button secondary" type="button">End</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <p id="status" class="sr-only" role="status" aria-live="polite"></p>
+  </main>
+  <script type="module" src="/src/riddle/riddle.js"></script>
+</body>
+</html>

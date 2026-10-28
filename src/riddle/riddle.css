@@ -1,0 +1,421 @@
+@font-face {
+  font-family: "Inter Variable";
+  font-style: normal;
+  font-display: swap;
+  font-weight: 100 900;
+  src: url(/fonts/inter-variable-latin.woff2) format("woff2-variations");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+:root {
+  color-scheme: light;
+  --bg: #fbf6f0;
+  --text: #141813;
+  --text-muted: #3d433a;
+  --ink: #3d3029;
+  --primary: #1d6a3c;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+:focus-visible {
+  outline: 3px solid currentColor;
+  outline-offset: 2px;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: "Inter Variable", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* The scene sits in the middle of the window, up and down too. */
+.page {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: 100vh;
+  min-height: 100dvh;
+  max-width: 60rem;
+  margin: 0 auto;
+  padding: 24px 20px;
+}
+
+.stage {
+  position: relative;
+}
+
+/* The room: lines in ink, soft fills. */
+.room {
+  display: block;
+  width: 100%;
+  height: auto;
+  border: 1px solid #e3e7e1;
+  border-radius: 6px;
+  color: var(--ink);
+  background: #fff;
+}
+
+.room text {
+  fill: var(--ink);
+  stroke: none;
+  font: 600 13px "Inter Variable", sans-serif;
+}
+
+.wall { fill: #fffaf3; stroke: none; }
+.floor { fill: #efe2cf; stroke: none; }
+.skirting { fill: #f6ecdc; stroke: #cdb9a0; stroke-width: 1.2; }
+.faint { stroke: #cdb9a0; stroke-width: 1.2; }
+.sky { fill: #e4f0f5; stroke: none; }
+.hill { fill: #bcd5aa; stroke: none; }
+.crown { fill: #8fbf7f; stroke: #5d8f52; }
+.sun { fill: #f6d48a; stroke: #d39a3c; }
+.sun-ray { stroke: #d39a3c; }
+.pane { fill: #f1f7f9; }
+.wood { fill: #e3cba9; }
+.door-wood { fill: #ead7bb; }
+.door-panel { fill: #f1e2cb; }
+.frame { fill: #f6ead6; }
+.mat { fill: #fffdf8; }
+.flap { fill: #dcc4a2; }
+.bowl { fill: #dcebf2; }
+.bowl-rim { fill: #f3f8fa; }
+.jar { fill: #dcebf2; }
+.sack { fill: #efe0c3; }
+.seed { stroke: #9a7a3c; stroke-width: 2.6; }
+.rug { fill: #f1d6cc; stroke: #d9b2a4; }
+.ink { fill: currentColor; }
+.fur { fill: #fff; }
+.slot { stroke: #cdb9a0; stroke-dasharray: 3 3; stroke-width: 1.2; }
+.cube-face { fill: #fdf6e8; }
+.basket { fill: #e8cf9f; }
+.inside { fill: #d9bf98; }
+.leaf-line { stroke: #5d8f52; }
+.carrot-body { fill: #f2a14e; stroke: #c46f22; }
+.carrot-line { stroke: #c46f22; stroke-width: 1; }
+.flap-hole { fill: #c8ad86; }
+.flap-door { fill: #dcc4a2; }
+.falling-seed { fill: #9a7a3c; stroke: none; opacity: 0; }
+.pip,
+.mau {
+  opacity: 0;
+  transition: opacity 0.2s;
+
+  &.show {
+    opacity: 1;
+  }
+}
+
+/* What riddle.js clicks on. */
+.cube,
+#cat,
+#bird {
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* The cubes stay hidden in the basket until riddle.js tips them out. */
+.cube {
+  transform-box: fill-box;
+  transform-origin: center;
+  transition: transform 0.45s ease-in-out;
+
+  &:not(.out) {
+    visibility: hidden;
+  }
+}
+
+.cube[aria-disabled="true"] {
+  cursor: default;
+}
+
+/* The slots show as the cubes fall, and shake gently when they spell the
+   wrong word. */
+.slots {
+  opacity: 0;
+  transition: opacity 0.8s 0.6s;
+
+  .cubes-out & {
+    opacity: 1;
+  }
+
+  &.nope {
+    animation: nope 0.4s;
+  }
+}
+
+@keyframes nope {
+  25% { translate: -3px 0; }
+  75% { translate: 3px 0; }
+}
+
+/* The cupboard opens: the doors fold back. */
+.cupboard-door {
+  transform-box: fill-box;
+  transition: scale 0.8s ease-in-out;
+
+  &.left { transform-origin: left center; }
+  &.right { transform-origin: right center; }
+
+  .cupboard-open & {
+    scale: 0.1 1;
+  }
+}
+
+/* The carrot gets shorter toward its leaves with each of the rabbit's
+   bites (riddle.js sets its scale). */
+.carrot-root {
+  transform-box: fill-box;
+  transform-origin: left center;
+  transition: scale 0.15s ease-out;
+}
+
+/* The cat flap swings up as the rabbit comes through. */
+.flap {
+  transform-box: fill-box;
+  transform-origin: top center;
+  transition: scale 0.4s;
+
+  .flap-open & {
+    scale: 1 0.15;
+  }
+}
+
+#rabbit {
+  visibility: hidden;
+
+  &.here {
+    visibility: visible;
+  }
+
+  &.eating .rabbit-body {
+    transform-box: fill-box;
+    transform-origin: 70% 100%;
+    animation: nibble 0.45s ease-in-out infinite alternate;
+  }
+}
+
+@keyframes nibble {
+  to { rotate: -4deg; }
+}
+
+/* The sleeping cat's z's: small and fine, each fading in, drifting up and
+   fading out, one after the other. */
+.zz {
+  stroke-width: 0.7;
+  scale: 0.75;
+  transform-box: fill-box;
+  transform-origin: 0 100%;
+  opacity: 0;
+  animation: doze 6s ease-in-out infinite;
+
+  & + & {
+    animation-delay: 1.5s;
+  }
+}
+
+@keyframes doze {
+  40%,
+  60% {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+    translate: 1px -4px;
+  }
+}
+
+/* The cat's poses. */
+:is(#cat, #rabbit) :is(.pose-asleep, .pose-awake) {
+  display: none;
+}
+
+:is(#cat, #rabbit)[data-pose="asleep"] .pose-asleep,
+:is(#cat, #rabbit)[data-pose="awake"] .pose-awake {
+  display: inline;
+}
+
+/* The bird leans a little toward its bowl to look in, and once there are
+   seeds, eats: two quick little pecks toward the bowl, then a pause. */
+.bird-body {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  transition: rotate 0.3s;
+
+  &.peek {
+    rotate: 8deg;
+  }
+
+  #bird.eating & {
+    animation: peck 1.6s ease-in-out infinite;
+  }
+}
+
+@keyframes peck {
+  0%,
+  40%,
+  60%,
+  80%,
+  100% {
+    rotate: 0deg;
+  }
+  50%,
+  70% {
+    rotate: 9deg;
+  }
+}
+
+/* Resting on the shelf, the bird lifts its wing a little, twice, every 3
+   seconds. */
+#bird.resting .wing {
+  transform-box: fill-box;
+  transform-origin: 100% 50%;
+  animation: flutter 3s ease-in-out infinite;
+}
+
+@keyframes flutter {
+  0%,
+  84%,
+  92%,
+  100% {
+    rotate: 0deg;
+  }
+  88%,
+  96% {
+    rotate: 18deg;
+  }
+}
+
+/* The bag of seeds tips over to the left, around its bottom-left corner. */
+#seed-bag {
+  transform-box: view-box;
+  transform-origin: 230px 168px;
+  transition: rotate 0.6s ease-in;
+
+  .bag-tipped & {
+    rotate: -90deg;
+  }
+}
+
+/* The basket tips over to the right, around its bottom-right corner, and
+   the cubes peeking out of it are the ones that tumble out. */
+#basket {
+  transform-box: view-box;
+  transform-origin: 338px 168px;
+  transition: rotate 0.5s ease-in;
+
+  .basket-tipped & {
+    rotate: 90deg;
+  }
+}
+
+.cubes-out .basket-cubes {
+  visibility: hidden;
+}
+
+#bowl-seeds {
+  opacity: 0;
+  transition: opacity 0.4s;
+
+  .bowl-full & {
+    opacity: 1;
+  }
+}
+
+/* Shown to screen readers only: the page's heading and the messages that
+   describe what happens in the room. */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* When both riddles are solved: a card over the scene, which a pale veil
+   softens so the card stands out. On narrow screens, where the scene is
+   too small to hold it, the card sits below the scene instead. */
+.actions:not([hidden]) {
+  display: flex;
+  justify-content: center;
+  margin-top: 16px;
+  animation: appear 0.6s ease-out;
+}
+
+@media (min-width: 560px) {
+  .actions:not([hidden]) {
+    position: absolute;
+    inset: 0;
+    align-items: center;
+    margin-top: 0;
+    border-radius: 6px;
+    background: rgb(255 250 243 / 0.78);
+  }
+}
+
+@keyframes appear {
+  from { opacity: 0; }
+}
+
+.card {
+  max-width: 100%;
+  padding: 24px 28px;
+  border: 2px solid var(--ink);
+  border-radius: 10px;
+  background: #fff;
+  box-shadow: 0 6px 24px rgb(61 48 41 / 0.18);
+  text-align: center;
+
+  p {
+    margin: 0 0 18px;
+    color: var(--text);
+    font-size: 1.25rem;
+    font-weight: 600;
+  }
+}
+
+.buttons {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+}
+
+.button {
+  display: inline-block;
+  min-width: 10rem;
+  padding: 10px 18px;
+  border: 2px solid var(--primary);
+  border-radius: 6px;
+  background: var(--primary);
+  color: #fff;
+  font: inherit;
+  font-weight: 600;
+  text-align: center;
+  text-decoration: none;
+  cursor: pointer;
+
+  &.secondary {
+    background: transparent;
+    color: var(--primary);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before {
+    transition: none !important;
+    animation: none !important;
+  }
+
+  .zz {
+    opacity: 1;
+  }
+}
