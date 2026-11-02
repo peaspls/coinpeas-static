@@ -2,11 +2,15 @@
 // as CoinGecko returns them, to the path given as the first CLI arg. There's
 // no default path, so it never overwrites a file unless told which one.
 //
-// Usage: node scripts/fetch-coins.mjs <output-path>
+// Usage: node scripts/fetch-coins.mjs <output-path> [--if-missing]
+//
+// With --if-missing, it does nothing when the output file already exists.
+// It creates the output file's folder if needed.
 //
 // Set COINGECKO_API_KEY to send a CoinGecko demo API key with the request;
 // without one it uses the keyless public API.
-import { writeFile, rename } from "node:fs/promises";
+import { existsSync } from "node:fs";
+import { mkdir, writeFile, rename } from "node:fs/promises";
 import path from "node:path";
 
 // The top 50 coins priced in US dollars, largest market cap first. Each coin
@@ -17,10 +21,18 @@ const COINGECKO_URL =
   "?vs_currency=usd&order=market_cap_desc&per_page=50&page=1&sparkline=true" +
   "&price_change_percentage=1h,7d,30d";
 
-if (!process.argv[2]) {
-  throw new Error("Usage: node scripts/fetch-coins.mjs <output-path>");
+const args = process.argv.slice(2);
+const IF_MISSING = args.includes("--if-missing");
+const outputArg = args.find((arg) => !arg.startsWith("--"));
+if (!outputArg) {
+  throw new Error("Usage: node scripts/fetch-coins.mjs <output-path> [--if-missing]");
 }
-const OUTPUT_PATH = path.resolve(process.argv[2]);
+const OUTPUT_PATH = path.resolve(outputArg);
+
+if (IF_MISSING && existsSync(OUTPUT_PATH)) {
+  console.log(`${OUTPUT_PATH} already exists, not fetching`);
+  process.exit(0);
+}
 
 // Per attempt, so a hung request fails fast enough to leave time to retry.
 const REQUEST_TIMEOUT_MS = 15_000;
@@ -86,6 +98,7 @@ const output = {
 // Write then rename so a crash mid-write can't leave a truncated output file.
 // Indented, so a change to the data reads clearly in a diff.
 const tmpPath = `${OUTPUT_PATH}.tmp`;
+await mkdir(path.dirname(OUTPUT_PATH), { recursive: true });
 await writeFile(tmpPath, JSON.stringify(output, null, 2));
 await rename(tmpPath, OUTPUT_PATH);
 

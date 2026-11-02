@@ -144,7 +144,7 @@ Run the Vite development server:
 npm run dev
 ```
 
-This renders the static `data/coins.json` fixture — dev intentionally never fetches live data, so it stays fast and deterministic regardless of CoinGecko's availability or rate limits. `npm run fetch-coins` is reserved for deploys and always targets `data/coins.json`; running it locally would overwrite the git-tracked fixture, so only do that deliberately (e.g. after changing what `fetch-coins.mjs` asks CoinGecko for) and review the diff before committing:
+`data/coins.json` isn't in the repo (`data/` is git-ignored). The first `npm run dev` or `npm run build` fetches it from CoinGecko once; after that both use the saved file and never fetch, so they stay fast and work regardless of CoinGecko's availability or rate limits. To get fresh coins, delete the file or run:
 
 ```bash
 npm run fetch-coins

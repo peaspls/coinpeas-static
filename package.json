@@ -7,7 +7,9 @@
     "node": "24.x"
   },
   "scripts": {
+    "predev": "node scripts/fetch-coins.mjs data/coins.json --if-missing",
     "dev": "vite",
+    "prebuild": "node scripts/fetch-coins.mjs data/coins.json --if-missing",
     "build": "vite build",
     "preview": "vite preview",
     "fetch-coins": "node scripts/fetch-coins.mjs data/coins.json",
