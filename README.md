@@ -41,7 +41,7 @@ Nearly all of the code, and this README, was written by AI (Claude), directed to
 
 `coinpeas` is an assets-only Worker — it just serves static files, with no application code on the read path. A GitHub Actions workflow does all the real work outside Cloudflare: fetching fresh coin data, rebuilding the site, and redeploying it. A separate, tiny `coinpeas-cron` Worker starts that workflow every three hours (see [Cron schedule](#cron-schedule)); it runs only on its schedule and serves no requests. Redeploying on every update, rather than running a live backend, means there's no origin server to operate — Cloudflare's edge network caches and serves the static output worldwide, and the GitHub Actions workflow is the only recurring cost surface.
 
-`data/coins.json` is inlined directly into `index.html` at build time instead of being fetched separately. `index.html` is already revalidated on every visit (it's what points visitors at the current asset hashes), so this adds no cacheability cost and saves an extra request.
+`data/coins.json` is inlined directly into `index.html` at build time instead of being fetched separately, trimmed by `plugins/inline-coins-data.js` to just the fields the frontend renders. `index.html` is already revalidated on every visit (it's what points visitors at the current asset hashes), so this adds no cacheability cost and saves an extra request.
 
 ## Static asset caching
 
@@ -80,7 +80,7 @@ Once the two required secrets are set, the next scheduled run (or a manual one v
 On each run, `.github/workflows/deploy.yml`:
 
 1. Checks out the repo.
-2. `npm run fetch-coins` — fetches the top 50 coins from CoinGecko (with a timeout and retries) and overwrites `data/coins.json`, trimmed to just the fields the frontend renders. This runs *before* the build, since Vite reads `data/coins.json` at build time to inline it into `index.html`.
+2. `npm run fetch-coins` — fetches the top 50 coins from CoinGecko (with a timeout and retries) and overwrites `data/coins.json` with the coins just as CoinGecko returns them. This runs *before* the build, since Vite reads `data/coins.json` at build time to inline it into `index.html`.
 3. `npm ci` + `npm run build` (Vite) — rebuilds `dist/` from scratch on every run, since the coin data (and therefore the build output) changes on almost every run.
 4. `wrangler deploy` uploads `dist/` as a new `coinpeas` version.
 
@@ -144,7 +144,7 @@ Run the Vite development server:
 npm run dev
 ```
 
-This renders the static `data/coins.json` fixture as-is — dev intentionally never fetches live data, so it stays fast and deterministic regardless of CoinGecko's availability or rate limits. `npm run fetch-coins` is reserved for deploys and always targets `data/coins.json`; running it locally would overwrite the git-tracked fixture, so only do that deliberately (e.g. after changing which fields `fetch-coins.mjs` keeps) and review the diff before committing:
+This renders the static `data/coins.json` fixture — dev intentionally never fetches live data, so it stays fast and deterministic regardless of CoinGecko's availability or rate limits. `npm run fetch-coins` is reserved for deploys and always targets `data/coins.json`; running it locally would overwrite the git-tracked fixture, so only do that deliberately (e.g. after changing what `fetch-coins.mjs` asks CoinGecko for) and review the diff before committing:
 
 ```bash
 npm run fetch-coins

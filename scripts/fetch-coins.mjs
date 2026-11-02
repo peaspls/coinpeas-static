@@ -1,9 +1,17 @@
-// Fetches the top 50 coins by market cap from CoinGecko and writes them to
-// the path given as the first CLI arg. There's no default path, so it never
-// overwrites a file unless told which one.
+// Fetches the top 50 coins by market cap from CoinGecko and writes them, just
+// as CoinGecko returns them, to the path given as the first CLI arg. There's
+// no default path, so it never overwrites a file unless told which one.
+//
+// Usage: node scripts/fetch-coins.mjs <output-path>
+//
+// Set COINGECKO_API_KEY to send a CoinGecko demo API key with the request;
+// without one it uses the keyless public API.
 import { writeFile, rename } from "node:fs/promises";
 import path from "node:path";
 
+// The top 50 coins priced in US dollars, largest market cap first. Each coin
+// also comes with a 7-day price sparkline and its price change over the last
+// hour, 7 days and 30 days, on top of the 24-hour change it always has.
 const COINGECKO_URL =
   "https://api.coingecko.com/api/v3/coins/markets" +
   "?vs_currency=usd&order=market_cap_desc&per_page=50&page=1&sparkline=true" +
@@ -13,21 +21,13 @@ if (!process.argv[2]) {
   throw new Error("Usage: node scripts/fetch-coins.mjs <output-path>");
 }
 const OUTPUT_PATH = path.resolve(process.argv[2]);
+
 // Per attempt, so a hung request fails fast enough to leave time to retry.
 const REQUEST_TIMEOUT_MS = 15_000;
 const MAX_ATTEMPTS = 3;
+// The wait grows with each failed attempt: 2 s after the first, 4 s after
+// the second.
 const RETRY_DELAY_MS = 2_000;
-
-// The fields kept per coin, written out columnar (see below) so each name
-// appears once in the output file, not once per coin.
-const FIELDS = [
-  "market_cap_rank",
-  "name",
-  "symbol",
-  "current_price",
-  "price_change_percentage_24h",
-  "market_cap",
-];
 
 const headers = {};
 if (process.env.COINGECKO_API_KEY) {
@@ -40,6 +40,9 @@ function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
+// Returns CoinGecko's list of coins, one object per coin, trying up to
+// MAX_ATTEMPTS times. Throws the last error if every attempt fails, which
+// exits the script with a non-zero status.
 async function fetchCoins() {
   for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
     try {
@@ -58,15 +61,7 @@ async function fetchCoins() {
         throw new Error("CoinGecko returned an empty or invalid coin list");
       }
 
-      // Keep only the fields src/app.js renders — CoinGecko's raw objects
-      // carry ~30 fields (ath, atl, supply figures, a 7-day sparkline, ...)
-      // that would otherwise be downloaded by every visitor for no reason.
-      // Written columnar (one array per field, see FIELDS above) rather than
-      // one object per coin: grouping same-typed values together compresses
-      // better than interleaving them row by row.
-      return Object.fromEntries(
-        FIELDS.map((field) => [field, coins.map((coin) => coin[field])])
-      );
+      return coins;
     } catch (error) {
       // Retry on any failure (network error, timeout, bad status, malformed
       // body) rather than special-casing which ones are "retryable" — at
@@ -79,8 +74,9 @@ async function fetchCoins() {
 }
 
 const coins = await fetchCoins();
-const coinCount = coins[FIELDS[0]].length;
 
+// The coins plus where they came from and when they were fetched, as an ISO
+// 8601 timestamp in UTC.
 const output = {
   source: "CoinGecko",
   generated_at: new Date().toISOString(),
@@ -88,8 +84,9 @@ const output = {
 };
 
 // Write then rename so a crash mid-write can't leave a truncated output file.
+// Indented, so a change to the data reads clearly in a diff.
 const tmpPath = `${OUTPUT_PATH}.tmp`;
-await writeFile(tmpPath, JSON.stringify(output));
+await writeFile(tmpPath, JSON.stringify(output, null, 2));
 await rename(tmpPath, OUTPUT_PATH);
 
-console.log(`Wrote ${coinCount} coins to ${OUTPUT_PATH}`);
+console.log(`Wrote ${coins.length} coins to ${OUTPUT_PATH}`);
