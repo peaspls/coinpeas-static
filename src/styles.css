@@ -533,19 +533,9 @@ body {
   fill-opacity: 0.25;
 }
 
-/* Plants follow the season: none in winter, tulips in spring, asters in
-   autumn, and everything in summer. */
-.summer-plants,
-.spring-plants,
-.autumn-plants,
+/* No plants in winter. */
 [data-season="winter"] .plants {
   display: none;
-}
-
-[data-season="spring"] .spring-plants,
-[data-season="autumn"] .autumn-plants,
-[data-season="summer"] :is(.summer-plants, .spring-plants, .autumn-plants) {
-  display: inline;
 }
 
 /* The rabbit, the cat and the bird are white, a soft moonlit white in
@@ -554,11 +544,8 @@ body {
   fill: light-dark(#ffffff, #c3c9d2);
 }
 
-/* Grass, sprouts and stems are green, muted by moonlight in dark mode. */
-.plants,
-.summer-plants,
-.spring-plants,
-.autumn-plants {
+/* Grass and sprouts are green, muted by moonlight in dark mode. */
+.plants {
   color: light-dark(#3f7a46, #7c847f);
 }
 
@@ -599,23 +586,8 @@ body {
   --tone: var(--leaf2);
 }
 
-/* Flower colours, coloured like the leaves (and muted the same way at
-   night). */
-.tulip {
-  --tone: light-dark(#d4566f, #d96a80);
-}
-
-.aster {
-  --tone: light-dark(#7d5fc0, #9a82d6);
-}
-
-.aster-centre {
-  --tone: light-dark(#d9a02c, #e0b456);
-}
-
 .leaves,
-.leaves-alt,
-.bloom {
+.leaves-alt {
   stroke: var(--tone);
   fill: var(--tone);
 

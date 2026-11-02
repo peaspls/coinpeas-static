@@ -54,19 +54,9 @@ const MOON = "M286 13a8 8 0 1 0 8 12.5 6.5 6.5 0 1 1-8-12.5z";
 const STARS = "M38 34h0M74 14h0M236 16h0M322 52h0M2 60h0M-40 22h0M-22 50h0M16 12h0M56 44h0M98 30h0M104 64h0M222 42h0M250 28h0M304 6h0M340 26h0M362 48h0M384 16h0M28 61h0M306 41h0M-73 31h0M201 9h0M35 7h0M395 57h0M373 31h0M-15 71h0M381 68h0M281 59h0M315 18h0M360 68h0M394 32h0";
 const TWINKLES = ["M262 44v5m-2.5-2.5h5", "M60 18v4m-2-2h4"];
 
-// Plants on the ground: a tuft of grass and a sprout, none in winter (.plants);
-// summer adds more grass and a few flowers (.summer-plants). Tulips grow in
-// spring (.spring-plants) and asters in autumn (.autumn-plants); summer shows
-// them all.
+// Plants on the ground: a tuft of grass and a sprout, none in winter (.plants).
 const PLANTS_SOFT = "M203 107c-2-3-6-3-7-1 2 2 5 2 7 1zm0-2c2-3 6-3 7-1-2 2-5 2-7 1z";
 const PLANTS_LINES = "M120 113l-3-7m5 7v-9m2 9 3-6M203 113v-8";
-const SUMMER_SOFT = "M133.5 100.5a2.5 2.5 0 1 0 5 0 2.5 2.5 0 1 0-5 0M185.5 102.5a2.5 2.5 0 1 0 5 0 2.5 2.5 0 1 0-5 0M260.5 100.8a2.5 2.5 0 1 0 5 0 2.5 2.5 0 1 0-5 0";
-const SUMMER_LINES = "M136 113c1-4-1-7 0-10m0-2.5h0M188 113c1-3.2-1-5.6 0-8m0-2.5h0M263 113.3c1-4-1-7 0-10m0-2.5h0M174 113l-3-7m5 7v-9m2 9 3-6M57 113.2l-3-7m5 7v-9m2 9 3-6";
-const SPRING_LINES = "M22 114c.5-4-.5-8 0-11M22 112.5c-3-2-4.5-5-3.5-8.5 2.2 2 3.5 5 3.5 8.5M144 113c.5-4-.5-8 0-11M144 111.5c-3-2-4.5-5-3.5-8.5 2.2 2 3.5 5 3.5 8.5M296 114c.5-4-.5-8 0-11M296 112.5c-3-2-4.5-5-3.5-8.5 2.2 2 3.5 5 3.5 8.5";
-const TULIPS = "M19 98.5q0 4.5 3 4.5q3 0 3-4.5l-1.5 1.6-1.5-2.2-1.5 2.2zM141 97.5q0 4.5 3 4.5q3 0 3-4.5l-1.5 1.6-1.5-2.2-1.5 2.2zM293 98.5q0 4.5 3 4.5q3 0 3-4.5l-1.5 1.6-1.5-2.2-1.5 2.2z";
-const AUTUMN_LINES = "M36 114c-1-4 1-7 0-10M128 113c-1-4 1-7 0-10M280 114c-1-4 1-7 0-10";
-const ASTER_PETALS = "M37.6 101l2.2 0M37.13 102.13l1.56 1.56M36 102.6l0 2.2M34.87 102.13l-1.56 1.56M34.4 101l-2.2 0M34.87 99.87l-1.56 -1.56M36 99.4l-0 -2.2M37.13 99.87l1.56 -1.56M129.6 100l2.2 0M129.13 101.13l1.56 1.56M128 101.6l0 2.2M126.87 101.13l-1.56 1.56M126.4 100l-2.2 0M126.87 98.87l-1.56 -1.56M128 98.4l-0 -2.2M129.13 98.87l1.56 -1.56M281.6 101l2.2 0M281.13 102.13l1.56 1.56M280 102.6l0 2.2M278.87 102.13l-1.56 1.56M278.4 101l-2.2 0M278.87 99.87l-1.56 -1.56M280 99.4l-0 -2.2M281.13 99.87l1.56 -1.56";
-const ASTER_CENTRES = "M36 101h0M128 100h0M280 101h0";
 
 // Rabbit and cat are drawn standing on y=57 and moved into place. Each
 // animal has an awake pose and an asleep one.
@@ -133,9 +123,6 @@ const poses = (awake, asleep) => `<g class="awake">${awake}</g><g class="asleep"
 
 export const FOOTER_SCENE_SVG = `<svg class="footer-scene" viewBox="-80 0 480 130" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">` +
   `<g class="plants"><path d="${PLANTS_SOFT}" ${SOFT}/><path d="${PLANTS_LINES}"/></g>` +
-  `<g class="summer-plants"><path d="${SUMMER_SOFT}" ${SOFT}/><path d="${SUMMER_LINES}"/></g>` +
-  `<g class="spring-plants"><path d="${SPRING_LINES}"/><path class="bloom tulip" d="${TULIPS}" fill-opacity=".5"/></g>` +
-  `<g class="autumn-plants"><path d="${AUTUMN_LINES}"/><path class="bloom aster" d="${ASTER_PETALS}"/><path class="bloom aster-centre" d="${ASTER_CENTRES}" stroke-width="2.4"/></g>` +
   `<a class="rabbit-link" href="/riddle" tabindex="-1">${RABBIT_HIT}<g class="rabbit" transform="translate(-293 56)"><path class="fur" d="${RABBIT_BODY}"/><path d="${RABBIT_TAIL}"/>${poses(pose(RABBIT_AWAKE), pose(RABBIT_ASLEEP))}</g></a>` +
   `<g class="cat" transform="translate(-244 56)">${poses(pose(CAT_AWAKE, `<path class="cat-tail" d="${CAT_TAIL}"/>`), pose(CAT_ASLEEP, CAT_ZZ.map((d) => `<path class="zz" d="${d}"/>`).join("")))}</g>` +
   `<g class="day-sky sun">${SKY_HIT}<path d="${SUN_DISC}" fill-opacity=".3"/><path d="${SUN_RAYS}"/></g>` +
