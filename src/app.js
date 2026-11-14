@@ -47,26 +47,6 @@ function renderShell() {
           <p>Efficient, as far as is possible and practicable.</p>
         </section>
 
-        <div id="list-meta" class="list-meta" hidden>
-          <div class="updated-row">
-            <span id="updated-at" class="updated-at"></span>
-            <button
-              id="updated-info-btn"
-              class="info-btn"
-              type="button"
-              aria-expanded="false"
-              aria-controls="updated-info-popover"
-              aria-label="Refresh schedule info"
-            >
-              ${INFO_ICON}
-            </button>
-            <div id="updated-info-popover" class="info-popover" role="tooltip" hidden>
-              <strong class="info-title">Next update around <span id="next-update"></span></strong>
-              Fresh prices arrive about every three hours. Reload then to see them.
-            </div>
-          </div>
-        </div>
-
         <section id="panel" class="panel" aria-live="polite" hidden>
           <div id="error-state" class="state-block" hidden>
             <p>We couldn't reach the market data right now.</p>
@@ -90,6 +70,23 @@ function renderShell() {
         </section>
 
         <div id="list-source" class="list-source" hidden>
+          <div class="updated-row">
+            <span id="updated-at" class="updated-at"></span>
+            <button
+              id="updated-info-btn"
+              class="info-btn"
+              type="button"
+              aria-expanded="false"
+              aria-controls="updated-info-popover"
+              aria-label="Refresh schedule info"
+            >
+              ${INFO_ICON}
+            </button>
+            <div id="updated-info-popover" class="info-popover" role="tooltip" hidden>
+              <strong class="info-title">Next update around <span id="next-update"></span></strong>
+              Fresh prices arrive about every three hours. Reload then to see them.
+            </div>
+          </div>
           <a class="attribution" href="https://www.coingecko.com/en/api/" target="_blank" rel="noopener">Powered by CoinGecko API</a>
         </div>
       </main>
@@ -106,14 +103,12 @@ function renderShell() {
         <span class="footer-mark" aria-hidden="true">${BRAND_MARK_SVG}</span>
         Give peas a chance. A <a class="footer-link" href="https://github.com/peaspls" target="_blank" rel="noopener">peaspls</a> project · <a class="footer-link" href="https://github.com/peaspls/coinpeas-static" target="_blank" rel="noopener">View source on GitHub</a>
       </p>
-      <p class="footer-hint">Follow the white rabbit.</p>
     </footer>`;
 }
 
 const ELEMENT_IDS = {
   panel: "panel",
   error: "error-state",
-  listMeta: "list-meta",
   listSource: "list-source",
   tableWrapper: "table-wrapper",
   rows: "coin-rows",
@@ -242,20 +237,26 @@ function toCoinObjects(columns) {
   return rows;
 }
 
+function changeClassOf(change) {
+  return change > 0 ? "change-positive" : change < 0 ? "change-negative" : "";
+}
+
 function renderRows(coins) {
-  const html = coins.map((coin) => {
+  const html = coins.map((coin, i) => {
     const change = coin.price_change_percentage_24h;
-    const changeClass = change > 0 ? "change-positive" : change < 0 ? "change-negative" : "";
+    const changeClass = changeClassOf(change);
     const name = escapeHTML(coin.name);
     const symbol = escapeHTML(coin.symbol);
     return `
-      <tr>
+      <tr class="coin-row" data-index="${i}">
         <td class="col-rank">${coin.market_cap_rank ?? PLACEHOLDER}</td>
         <td class="col-coin">
           <div class="coin-cell">
             <span class="coin-label">
-              <span class="coin-name" title="${name}">${name}</span>
-              <span class="coin-symbol" title="${symbol}">${symbol}</span>
+              <button type="button" class="coin-toggle" aria-expanded="false" aria-controls="coin-details-${i}">
+                <span class="coin-name" title="${name}">${name}</span>
+                <span class="coin-symbol" title="${symbol}">${symbol}</span>
+              </button>
               <span class="stacked-price">${formatPrice(coin.current_price)} <span class="${changeClass}">${formatChange(change)}</span></span>
             </span>
           </div>
@@ -277,7 +278,6 @@ function setViewState(state) {
   els.panel.hidden = false;
   els.footer.hidden = false;
   els.error.hidden = state !== "error";
-  els.listMeta.hidden = state !== "table";
   els.listSource.hidden = state !== "table";
   els.tableWrapper.hidden = state !== "table";
 }
@@ -314,6 +314,8 @@ function loadCoins() {
     if (!Array.isArray(data?.coins?.name)) {
       throw new Error("Invalid coin data");
     }
+    dataTime = Date.parse(data.generated_at);
+    detailsCache.clear();
     renderRows(toCoinObjects(data.coins));
     updateCacheMeta(data);
     setViewState("table");
@@ -321,6 +323,236 @@ function loadCoins() {
     console.error("CoinPeas: failed to load coins", err);
     setViewState("error");
   }
+}
+
+// ---------- Coin details ----------
+// Clicking a coin's row (or its name button, from the keyboard) opens a
+// details row under it. Its details are fetched the first time it opens,
+// from coins/<generated_at in ms>/<position in the list>.json, as an array
+// in the order of the destructuring in renderDetails.
+
+// When the data was fetched, in ms; also the name of its details folder.
+let dataTime = 0;
+const detailsCache = new Map();
+
+function changeHTML(value) {
+  return `<span class="${changeClassOf(value)}">${formatChange(value)}</span>`;
+}
+
+// The sparkline has one price every 4 hours, the last one at the data's
+// generated_at time.
+const SPARKLINE_STEP_MS = 4 * 60 * 60 * 1000;
+const monthFormat = new Intl.DateTimeFormat("en-US", { month: "short" });
+const pointTimeFormat = new Intl.DateTimeFormat("en-US", {
+  month: "short",
+  day: "numeric",
+  hour: "2-digit",
+  minute: "2-digit",
+  hour12: false,
+});
+
+// A day's label under the chart, centred at x%: its date, or the month's
+// name on the first of a month, e.g. "30", "Dec", "2".
+function dayLabel(time, x) {
+  const day = new Date(time);
+  return day.getDate() === 1
+    ? `<span class="chart-month" style="left:${x}%">${monthFormat.format(day)}</span>`
+    : `<span style="left:${x}%">${day.getDate()}</span>`;
+}
+
+// The day boundaries (local midnights) between two times.
+function midnightsBetween(start, end) {
+  const midnights = [];
+  const day = new Date(start);
+  day.setHours(24, 0, 0, 0);
+  for (; day.getTime() < end; day.setDate(day.getDate() + 1)) midnights.push(day.getTime());
+  return midnights;
+}
+
+// About three round price levels (1, 2, 2.5 or 5 times a power of ten
+// apart) between min and max, with a formatter that shows just enough
+// decimals for them.
+function priceTicks(min, max) {
+  const rough = (max - min) / 3 || max || 1;
+  const power = 10 ** Math.floor(Math.log10(rough));
+  const step = [1, 2, 2.5, 5, 10].map((m) => m * power).find((s) => s >= rough);
+  const ticks = [];
+  for (let k = Math.ceil(min / step); k * step <= max; k++) ticks.push(k * step);
+  const decimals = Math.max(0, -Math.floor(Math.log10(step)) + (step / power === 2.5 ? 1 : 0));
+  const format = new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "USD",
+    minimumFractionDigits: decimals,
+    maximumFractionDigits: decimals,
+  });
+  return ticks.map((tick) => [tick, format.format(tick)]);
+}
+
+// Where each price sits in the chart, from the top, in percent: the
+// highest at 8, the lowest at 92.
+function chartScale(prices) {
+  const min = Math.min(...prices);
+  const max = Math.max(...prices);
+  const range = max - min || 1;
+  return { min, max, y: (price) => 92 - ((price - min) / range) * 84 };
+}
+
+// A price chart: the line over a soft fill, in red or green as the price
+// fell or rose over the 7 days, with that change beside its label, round
+// price levels on the right, the latest price marked on that axis and the
+// date under each day. Hovering (or dragging a finger along) it shows the
+// time and price at that point. It's an image whose label says in words
+// what the line shows; the text around it repeats that, so it's hidden
+// from screen readers.
+function chartHTML(prices, change, endTime, index) {
+  if (prices.length < 2) return "";
+  const { min, max, y } = chartScale(prices);
+  const startTime = endTime - (prices.length - 1) * SPARKLINE_STEP_MS;
+  const x = (time) => ((time - startTime) / (endTime - startTime)) * 100;
+  const last = prices.at(-1);
+
+  const line = prices.map((price, i) => `${x(startTime + i * SPARKLINE_STEP_MS).toFixed(1)},${y(price).toFixed(1)}`).join(" ");
+  const midnights = midnightsBetween(startTime, endTime);
+  const ticks = priceTicks(min, max);
+
+  // Price levels too close to the latest price's label are left out, so
+  // the two never overlap.
+  const tickLabels = ticks
+    .filter(([tick]) => Math.abs(y(tick) - y(last)) > 12)
+    .map(([tick, text]) => `<span style="top:${y(tick)}%">${text}</span>`)
+    .join("");
+
+  // Each day's label centred under its part of the line, skipping the part
+  // days at either end that are too narrow to hold one.
+  const bounds = [startTime, ...midnights, endTime];
+  const dayLabels = bounds
+    .slice(0, -1)
+    .map((dayStart, i) => [dayStart, bounds[i + 1]])
+    .filter(([from, to]) => (to - from) / (endTime - startTime) > 0.09)
+    .map(([from, to]) => dayLabel(from, x((from + to) / 2)))
+    .join("");
+
+  const label =
+    `Price over the last 7 days, from ${formatPrice(prices[0])} to ${formatPrice(last)}, ` +
+    `highest ${formatPrice(max)}, lowest ${formatPrice(min)}`;
+  return `
+    <figure class="chart">
+      <figcaption>Last 7 days ${changeHTML(change)}</figcaption>
+      <div class="chart-body">
+        <div class="chart-plot ${changeClassOf(change)}" data-index="${index}">
+          <svg viewBox="0 0 100 100" preserveAspectRatio="none" role="img" aria-label="${label}">
+            <defs>
+              <linearGradient id="chart-fill-${index}" x1="0" x2="0" y1="0" y2="1">
+                <stop offset="0" stop-color="currentColor" stop-opacity=".16"/>
+                <stop offset="1" stop-color="currentColor" stop-opacity="0"/>
+              </linearGradient>
+            </defs>
+            <polygon points="0,100 ${line} 100,100" fill="url(#chart-fill-${index})"/>
+            <polyline points="${line}" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" vector-effect="non-scaling-stroke"/>
+          </svg>
+          <div class="chart-cursor" hidden aria-hidden="true">
+            <span class="chart-dot"></span>
+            <span class="chart-tip"><span class="chart-tip-price"></span><span class="chart-tip-time"></span></span>
+          </div>
+        </div>
+        <div class="chart-axis" aria-hidden="true">
+          ${tickLabels}
+          <span class="chart-axis-last" style="top:${y(last)}%">${formatPrice(last)}</span>
+          <span class="chart-axis-sizer">${formatPrice(max)}</span>
+        </div>
+        <div class="chart-days" aria-hidden="true">${dayLabels}</div>
+      </div>
+    </figure>`;
+}
+
+// Moves the crosshair to the point nearest the pointer, with that point's
+// price and time in a box beside it. The box sits above and to the right
+// of the point, and goes to the left near the right edge and below near
+// the top, so it stays inside the chart.
+function showChartPoint(plot, clientX) {
+  const prices = detailsCache.get(Number(plot.dataset.index))?.at(-1);
+  if (!prices) return;
+  const box = plot.getBoundingClientRect();
+  const fraction = Math.min(1, Math.max(0, (clientX - box.left) / box.width));
+  const i = Math.round(fraction * (prices.length - 1));
+  const time = dataTime - (prices.length - 1 - i) * SPARKLINE_STEP_MS;
+  const x = i / (prices.length - 1);
+  const y = chartScale(prices).y(prices[i]);
+  const cursor = plot.querySelector(".chart-cursor");
+  const [dot, tip] = cursor.children;
+  cursor.hidden = false;
+  cursor.style.left = `${x * 100}%`;
+  dot.style.top = tip.style.top = `${y}%`;
+  tip.classList.toggle("is-left", x > 0.6);
+  tip.classList.toggle("is-below", y < 40);
+  tip.firstElementChild.textContent = formatPrice(prices[i]);
+  tip.lastElementChild.textContent = pointTimeFormat.format(time);
+}
+
+function hideChartPoint(plot) {
+  plot.querySelector(".chart-cursor").hidden = true;
+}
+
+function renderDetails(details, index) {
+  const [change7d, sparkline] = details;
+  return `<div class="coin-details">${chartHTML(sparkline, change7d, dataTime, index)}</div>`;
+}
+
+async function fetchDetails(index) {
+  if (detailsCache.has(index)) return detailsCache.get(index);
+  const response = await fetch(`/coins/${dataTime}/${index}.json`);
+  if (!response.ok) throw new Error(response.status === 404 ? "outdated" : `HTTP ${response.status}`);
+  const details = await response.json();
+  detailsCache.set(index, details);
+  return details;
+}
+
+async function toggleCoin(row) {
+  const index = Number(row.dataset.index);
+  const button = row.querySelector(".coin-toggle");
+  const open = button.getAttribute("aria-expanded") !== "true";
+  button.setAttribute("aria-expanded", String(open));
+
+  let detailsRow = document.getElementById(`coin-details-${index}`);
+  if (!open) {
+    detailsRow.hidden = true;
+    return;
+  }
+  if (!detailsRow) {
+    detailsRow = document.createElement("tr");
+    detailsRow.id = `coin-details-${index}`;
+    detailsRow.className = "details-row";
+    detailsRow.innerHTML = '<td colspan="5"></td>';
+    row.after(detailsRow);
+  }
+  detailsRow.hidden = false;
+
+  const cell = detailsRow.firstElementChild;
+  if (!detailsCache.has(index)) cell.innerHTML = '<p class="details-note">Loading details…</p>';
+  try {
+    cell.innerHTML = renderDetails(await fetchDetails(index), index);
+  } catch (err) {
+    console.error("CoinPeas: failed to load coin details", err);
+    cell.innerHTML =
+      err.message === "outdated"
+        ? '<p class="details-note">The list has been updated since this page was loaded. Reload the page to see the latest.</p>'
+        : '<p class="details-note">We couldn\'t load the details right now. Close and open the coin to try again.</p>';
+  }
+}
+
+function initCoinDetails() {
+  els.rows.addEventListener("click", (e) => {
+    const row = e.target.closest(".coin-row");
+    if (row) toggleCoin(row);
+  });
+  els.rows.addEventListener("pointermove", (e) => {
+    const plot = e.target.closest(".chart-plot");
+    if (plot) showChartPoint(plot, e.clientX);
+  });
+  els.rows.addEventListener("pointerout", (e) => {
+    const plot = e.target.closest(".chart-plot");
+    if (plot && !plot.contains(e.relatedTarget)) hideChartPoint(plot);
+  });
 }
 
 function initRetry() {
@@ -398,6 +630,7 @@ function init() {
 
   initTheme();
   initRetry();
+  initCoinDetails();
   initInfoPopover();
   initFooterScene();
   loadCoins();

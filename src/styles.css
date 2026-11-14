@@ -18,17 +18,18 @@
 
 :root {
   color-scheme: light dark;
-  --bg: light-dark(#fbf6f0, #0c0f17);
-  --surface: light-dark(#ffffff, #161916);
-  --surface-alt: light-dark(#e5ebe3, #1b1e1b);
+  --bg: light-dark(#f3f0ea, #0f0f0f);
+  --surface: light-dark(#ffffff, #181818);
+  --surface-alt: light-dark(#f2f2f2, #202020);
   --primary: light-dark(#1d6a3c, #8fd0a2);
   --primary-strong: light-dark(#123f24, #b6e6c3);
-  --secondary: light-dark(#7c9a7e, #7fa583);
-  --text: light-dark(#141813, #eef0ec);
-  --text-muted: light-dark(#3d433a, #b6bcb2);
-  --border: light-dark(#e3e7e1, #272b26);
-  --positive: light-dark(#2f7d4f, #7fd39a);
-  --negative: light-dark(#b3492f, #e08a72);
+  --secondary: light-dark(#4f4f4f, #b8b8b8);
+  --text: light-dark(#000000, #ebebeb);
+  --text-muted: light-dark(#4f4f4f, #b8b8b8);
+  --border: light-dark(#e0e0e0, #2e2e2e);
+  --chip: light-dark(#ebebeb, #2e2e2e);
+  --positive: light-dark(#067c68, #60a696);
+  --negative: light-dark(#cc2f3c, #d97173);
   --shadow: 0 1px 2px rgba(35, 40, 31, 0.06), 0 8px 24px rgba(35, 40, 31, 0.05);
   --shadow-dark: 0 1px 2px rgba(0, 0, 0, 0.3), 0 12px 28px rgba(0, 0, 0, 0.35);
   --radius: 6px;
@@ -153,7 +154,8 @@ body {
   width: 38px;
   height: 38px;
   border-radius: 50%;
-  background: var(--surface-alt);
+  background: light-dark(var(--surface), var(--surface-alt));
+  box-shadow: inset 0 0 0 1px light-dark(#e5e0d6, #0000);
   color: var(--primary);
   display: inline-flex;
   align-items: center;
@@ -220,35 +222,21 @@ body {
 }
 
 .panel {
-  /* Intentionally its own, slightly softer palette — not shared with :root. */
-  --surface-alt: light-dark(#f5f7f4, #1a1d1a);
-  --border: light-dark(#e6e9e4, #262a25);
-  --text-secondary: light-dark(#3d443b, #bac0b5);
-  --text-muted: light-dark(#474e45, #a8afa5);
-  --primary: light-dark(#6b8e63, #8fb586);
-  --primary-strong: light-dark(#4a6444, #a9cba1);
-  --accent-soft: light-dark(#e6eee2, #2c3a2a);
-  --positive: light-dark(#1a5c35, #8fc29a);
-  --negative: light-dark(#8f321e, #eba58f);
-
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  box-shadow: var(--shadow);
   overflow: hidden;
 }
 
-.list-meta {
-  display: flex;
-  justify-content: flex-end;
-  align-items: baseline;
-  gap: 8px;
-  margin-bottom: 8px;
-}
-
+/* Under the table: when the prices were updated, then their source, on one
+   line when there's room. */
 .list-source {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 4px 12px;
   margin-top: 8px;
-  text-align: right;
 }
 
 .updated-at {
@@ -373,7 +361,7 @@ body {
 
   th {
     font-size: 0.875rem;
-    font-weight: 600;
+    font-weight: 500;
     color: var(--text-muted);
   }
 
@@ -429,12 +417,11 @@ body {
 
 .col-marketcap {
   width: 23%;
-  color: var(--text-secondary);
+  color: var(--text-muted);
 }
 
 .col-change {
   width: 15%;
-  font-weight: 500;
 }
 
 .coin-cell {
@@ -461,9 +448,15 @@ body {
 }
 
 .coin-symbol {
-  display: block;
-  color: var(--text-muted);
-  font-size: 0.875rem;
+  display: inline-block;
+  margin-top: 3px;
+  padding: 1px 6px;
+  border-radius: 4px;
+  background: var(--chip);
+  font-size: 0.75rem;
+  font-weight: 500;
+  line-height: 1.5;
+  letter-spacing: 0.02em;
   text-transform: uppercase;
   white-space: normal;
   overflow-wrap: anywhere;
@@ -475,6 +468,203 @@ body {
 
 .change-negative {
   color: var(--negative);
+}
+
+/* A coin's row opens its details; the name is a button so it also works
+   from the keyboard. The focus ring goes round the whole row, since the
+   cell would cut off a ring round the name. */
+.coin-row {
+  cursor: pointer;
+}
+
+.coin-toggle {
+  display: block;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+
+  &:focus-visible {
+    outline: none;
+  }
+}
+
+.coin-table tbody .coin-row:has(.coin-toggle:focus-visible) {
+  outline: 3px solid var(--text);
+  outline-offset: -3px;
+}
+
+/* The details sit on the table's own white, right under the open coin's
+   row, with no line between the two. */
+.coin-table .details-row td {
+  padding-top: 16px;
+  background: var(--surface);
+  text-align: left;
+  white-space: normal;
+}
+
+.coin-table tbody .coin-row:has([aria-expanded="true"]) td {
+  border-bottom: none;
+}
+
+.coin-details {
+  padding-bottom: 12px;
+}
+
+.chart {
+  margin: 0;
+  font-size: 0.875rem;
+  color: var(--text-muted);
+
+  /* "Last 7 days" and the change over those days, together in one small
+     outlined pill. */
+  figcaption {
+    display: inline-flex;
+    gap: 6px;
+    padding: 1px 8px;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    background: var(--surface);
+    color: var(--text);
+    font-size: 0.75rem;
+    font-weight: 500;
+  }
+}
+
+/* The plot, with its price axis to the right and the days under it. */
+.chart-body {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  column-gap: 8px;
+  margin-top: 8px;
+}
+
+/* Dragging a finger sideways moves the crosshair; up and down still
+   scrolls the page. */
+.chart-plot {
+  position: relative;
+  height: 140px;
+  touch-action: pan-y;
+  cursor: crosshair;
+
+  svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+  }
+}
+
+/* The crosshair: a vertical line at the pointer's point, with a dot on the
+   price line. */
+.chart-cursor {
+  position: absolute;
+  inset-block: 0;
+  border-left: 1px dashed var(--text-muted);
+  pointer-events: none;
+}
+
+.chart-dot {
+  position: absolute;
+  left: -5px;
+  width: 9px;
+  height: 9px;
+  margin-top: -4.5px;
+  border: 2px solid var(--surface);
+  border-radius: 50%;
+  background: currentColor;
+}
+
+/* The hovered point's price over its time, in a small box beside it. */
+.chart-tip {
+  position: absolute;
+  left: 10px;
+  display: grid;
+  padding: 6px 10px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--surface);
+  box-shadow: var(--shadow);
+  color: var(--text-muted);
+  font-size: 0.8125rem;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  transform: translateY(calc(-100% - 8px));
+
+  &.is-left {
+    left: auto;
+    right: 10px;
+  }
+
+  &.is-below {
+    transform: translateY(8px);
+  }
+}
+
+.chart-tip-price {
+  color: var(--text);
+  font-size: 0.9375rem;
+}
+
+.chart-axis {
+  position: relative;
+  font-variant-numeric: tabular-nums;
+
+  span {
+    position: absolute;
+    left: 0;
+    transform: translateY(-50%);
+    white-space: nowrap;
+  }
+}
+
+/* The latest price, as an outlined label on the axis. */
+.chart-axis .chart-axis-last {
+  left: -6px;
+  padding: 2px 6px;
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  background: var(--surface);
+  color: var(--text);
+  font-weight: 500;
+}
+
+/* Never shown; gives the axis the width of its widest label. */
+.chart-axis .chart-axis-sizer {
+  position: static;
+  visibility: hidden;
+  padding: 0 4px;
+}
+
+.chart-days {
+  position: relative;
+  height: 1.4em;
+  margin-top: 4px;
+
+  span {
+    position: absolute;
+    transform: translateX(-50%);
+  }
+}
+
+/* Too narrow for every day side by side, so every other one. A month's
+   name always shows, and the days either side of it make room. */
+@media (max-width: 28.75em) {
+  .chart-days span:nth-child(even):not(.chart-month),
+  .chart-days span:has(+ .chart-month),
+  .chart-days .chart-month + span {
+    display: none;
+  }
+}
+
+.details-note {
+  margin: 0;
+  color: var(--text-muted);
 }
 
 /* A band of "ground" in the season's colour. */
@@ -779,7 +969,7 @@ body {
   text-decoration: underline;
 }
 
-.site-footer :is(.footer-tagline, .footer-hint) {
+.site-footer .footer-tagline {
   margin-top: 8px;
 }
 
@@ -863,7 +1053,6 @@ body {
 
   td .stacked-change {
     display: block;
-    font-weight: 500;
   }
 
   th .stacked-change {
@@ -883,7 +1072,6 @@ body {
     margin-top: 2px;
     white-space: normal;
     font-size: 0.9375rem;
-    font-weight: 500;
     color: var(--text);
   }
 
@@ -899,10 +1087,8 @@ body {
 /* When the system asks for more contrast: every text at full strength and
    firmer borders. */
 @media (prefers-contrast: more) {
-  :root,
-  .panel {
+  :root {
     --text-muted: var(--text);
-    --text-secondary: var(--text);
-    --border: light-dark(#7c8379, #7f877c);
+    --border: light-dark(#7c7c7c, #808080);
   }
 }
