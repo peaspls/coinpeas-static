@@ -582,6 +582,16 @@ function setInfoPopoverOpen(open) {
   }
   els.updatedInfoBtn.setAttribute("aria-expanded", String(open));
   els.updatedInfoPopover.hidden = !open;
+  if (open) keepInfoPopoverOnScreen();
+}
+
+// The popover hangs left from the info button, which can sit mid-screen on a
+// phone; move it right just enough to keep 12px clear of the left edge.
+function keepInfoPopoverOnScreen() {
+  const pop = els.updatedInfoPopover;
+  pop.style.setProperty("--shift", "0px");
+  const shift = 12 - pop.getBoundingClientRect().left;
+  if (shift > 0) pop.style.setProperty("--shift", `${shift}px`);
 }
 
 function initInfoPopover() {
@@ -598,6 +608,10 @@ function initInfoPopover() {
     ) {
       setInfoPopoverOpen(false);
     }
+  });
+
+  window.addEventListener("resize", () => {
+    if (!els.updatedInfoPopover.hidden) keepInfoPopoverOnScreen();
   });
 
   document.addEventListener("keydown", (e) => {
