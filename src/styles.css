@@ -33,31 +33,8 @@
   --shadow: 0 1px 2px rgba(35, 40, 31, 0.06), 0 8px 24px rgba(35, 40, 31, 0.05);
   --shadow-dark: 0 1px 2px rgba(0, 0, 0, 0.3), 0 12px 28px rgba(0, 0, 0, 0.35);
   --radius: 6px;
-  /* The footer's ground: dark soil, as moonlight shows it in dark mode. The
-     same in every season. */
+  /* The footer's ground: dark soil, as moonlight shows it in dark mode. */
   --footer-bg: light-dark(#3d3029, #0e0d11);
-  /* Season: the footer tree's leaves (fewer in winter). */
-  --leaf: #0000;
-  --leaf2: var(--leaf);
-
-  &[data-season="spring"] {
-    --leaf: light-dark(#e8a5b6, #d98fa4);
-    --leaf2: light-dark(#9cc787, #8fc28a);
-  }
-
-  &[data-season="summer"] {
-    --leaf: light-dark(#4f8f4f, #6fb070);
-    --leaf2: light-dark(#7aab55, #9ccf7a);
-  }
-
-  &[data-season="autumn"] {
-    --leaf: light-dark(#c7783a, #d9894f);
-    --leaf2: light-dark(#d1a43c, #c8a855);
-  }
-
-  &[data-season="winter"] {
-    --leaf: light-dark(#d88f78, #d98c7a);
-  }
 
   &[data-theme="light"] {
     color-scheme: light;
@@ -667,7 +644,7 @@ body {
   color: var(--text-muted);
 }
 
-/* A band of "ground" in the season's colour. */
+/* A band of "ground". */
 .site-footer {
   position: relative;
   isolation: isolate;
@@ -703,29 +680,6 @@ body {
   width: 480px;
   height: 130px;
   color: light-dark(var(--footer-bg), color-mix(in srgb, var(--footer-bg), #fff 35%));
-}
-
-/* Winter's bird feeder, softened by moonlight at night. */
-.winter-only {
-  display: none;
-
-  [data-season="winter"] & {
-    display: inline;
-  }
-}
-
-.feeder {
-  color: light-dark(#7a5a3c, #8a8790);
-}
-
-.feeder-house {
-  fill: currentColor;
-  fill-opacity: 0.25;
-}
-
-/* No plants in winter. */
-[data-season="winter"] .plants {
-  display: none;
 }
 
 /* The rabbit, the cat and the bird are white, a soft moonlit white in
@@ -766,37 +720,17 @@ body {
   z-index: -2;
 }
 
-/* The season's leaf colours; at night, muted most of the way toward the
-   scene's line colour, as if seen by moonlight. */
+/* Leaves in two greens, outlined and softly filled in their own colour. At
+   night each is muted most of the way toward the scene's line colour, as if
+   seen by moonlight: 15% of a brighter green (#6fb070, #9ccf7a) mixed into
+   that line colour. */
 .leaves {
-  --tone: var(--leaf);
+  color: light-dark(#4f8f4f, #646d66);
+  fill: currentColor;
 }
 
-.leaves-alt {
-  --tone: var(--leaf2);
-}
-
-.leaves,
-.leaves-alt {
-  stroke: var(--tone);
-  fill: var(--tone);
-
-  [data-theme="dark"] & {
-    stroke: color-mix(in srgb, var(--tone) 15%, currentColor);
-    fill: color-mix(in srgb, var(--tone) 15%, currentColor);
-  }
-}
-
-/* How full the crown is follows the year: sparse in winter (one colour
-   only), full in spring and autumn, and fullest in summer (with extra
-   leaves). */
-[data-season="winter"] .leaves-alt,
-.summer-only {
-  display: none;
-}
-
-[data-season="summer"] .summer-only {
-  display: inline;
+.leaves.alt {
+  color: light-dark(#7aab55, #6b7268);
 }
 
 .footer-tree {
@@ -821,7 +755,7 @@ body {
   fill: #e9b350;
 }
 
-.footer-scene :is(.sun, .moon, .footer-tree, .rabbit-link) {
+.footer-scene :is(.sun, .moon, .rabbit-link) {
   cursor: pointer;
 }
 

@@ -610,18 +610,11 @@ function initInfoPopover() {
 
 // ---------- Footer scene ----------
 // Clicking the sun brings the night (dark theme) and the moon brings the day
-// (light theme), like the theme buttons; clicking the tree moves on to the
-// next season until the page is reloaded.
-
-const SEASONS = ["spring", "summer", "autumn", "winter"];
+// (light theme), like the theme buttons.
 
 function initFooterScene() {
   els.footer.querySelector(".sun").addEventListener("click", () => chooseTheme("dark"));
   els.footer.querySelector(".moon").addEventListener("click", () => chooseTheme("light"));
-  els.footer.querySelector(".footer-tree").addEventListener("click", () => {
-    const current = SEASONS.indexOf(root.getAttribute("data-season"));
-    root.setAttribute("data-season", SEASONS[(current + 1) % SEASONS.length]);
-  });
 }
 
 function init() {

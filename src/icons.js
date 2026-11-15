@@ -37,14 +37,8 @@ export const INFO_ICON = `
 // tree of life at the centre with a bird on one of its branches, a rabbit
 // resting to its left and a cat sitting to its right, among a tuft of grass
 // and a sprout. Drawn in lines with a soft fill, like a quiet sketch; only the
-// leaves take colour (.leaves, .leaves-alt). The animals have awake (.awake) and
+// leaves take colour (.leaves). The animals have awake (.awake) and
 // asleep (.asleep) poses, for the stylesheet to choose between.
-
-// Winter's extra (.winter-only): a bird feeder hanging from a branch.
-const FEEDER =
-  `<g class="feeder"><path d="M138.5 66.4v3.3M131.6 74.4L138.5 69l6.9 5.4M134.6 85.2h-2.6"/>` +
-  `<path class="feeder-house" d="M133.6 74v8.4h9.8V74"/><circle cx="138.5" cy="78.2" r="1.6"/></g>`;
-
 
 // The sky, around the tree. By day a sun in a warm tint (.sun); at night, in
 // its place, a crescent moon (.moon), stars, and two that twinkle in turn.
@@ -54,7 +48,7 @@ const MOON = "M286 13a8 8 0 1 0 8 12.5 6.5 6.5 0 1 1-8-12.5z";
 const STARS = "M38 34h0M74 14h0M236 16h0M322 52h0M2 60h0M-40 22h0M-22 50h0M16 12h0M56 44h0M98 30h0M104 64h0M222 42h0M250 28h0M304 6h0M340 26h0M362 48h0M384 16h0M28 61h0M306 41h0M-73 31h0M201 9h0M35 7h0M395 57h0M373 31h0M-15 71h0M381 68h0M281 59h0M315 18h0M360 68h0M394 32h0";
 const TWINKLES = ["M262 44v5m-2.5-2.5h5", "M60 18v4m-2-2h4"];
 
-// Plants on the ground: a tuft of grass and a sprout, none in winter (.plants).
+// Plants on the ground: a tuft of grass and a sprout (.plants).
 const PLANTS_SOFT = "M203 107c-2-3-6-3-7-1 2 2 5 2 7 1zm0-2c2-3 6-3 7-1-2 2-5 2-7 1z";
 const PLANTS_LINES = "M120 113l-3-7m5 7v-9m2 9 3-6M203 113v-8";
 
@@ -98,23 +92,19 @@ const BIRD_ASLEEP = [
 const TRUNK = "M152 113c4-3 6-8 6.5-16 .3-8 .5-17 .5-27h2c0 10 .2 19 .5 27 .5 8 2.5 13 6.5 16";
 const BRANCHES = "M159 80c-8-4-18-9-26-20M161 80c8-4 18-9 26-20M159 72c-5-6-11-14-14-26M161 72c5-6 11-14 14-26M160 70V30M140 66c-5-1-9-4-11-8M180 66c5-1 9-4 11-8";
 
-// Leaves in two colours (.leaves, .leaves-alt), plus extra leaves that fill
-// the crown only in summer (.summer-only).
-const LEAVES = "M128.7 28.3q-.8-5.3-6.6-5.3q.8 5.3 6.6 5.3M189.5 36.6q-.8-5.3-6.6-5.3q.8 5.3 6.6 5.3M148.2 68.5q4-4.2 8 0q-4 4.2-8 0M143.6 52.7q4-4.2 8 0q-4 4.2-8 0M117.2 49.4q-.8-5.3-6.6-5.3q.8 5.3 6.6 5.3M155.4 58.2q.8-5.3 6.6-5.3q-.8 5.3-6.6 5.3M153.3 19q4.2 4 0 8q-4.2-4 0-8M133.6 46.6q.8-5.3 6.6-5.3q-.8 5.3-6.6 5.3M143.3 37.2q4-4.2 8 0q-4 4.2-8 0M133.4 58.9q4-4.2 8 0q-4 4.2-8 0M159.2 68.7q.8-5.3 6.6-5.3q-.8 5.3-6.6 5.3M176 51.7q4-4.2 8 0q-4 4.2-8 0";
-const LEAVES_ALT = "M168 19.7q4.2 4 0 8q-4.2-4 0-8M169.4 38.3q4.2 4 0 8q-4.2-4 0-8M157.9 32.9q-.8-5.3-6.6-5.3q.8 5.3 6.6 5.3M164.2 50.3q4-4.2 8 0q-4 4.2-8 0M181.1 28.2q4-4.2 8 0q-4 4.2-8 0M121.8 59.9q.8-5.3 6.6-5.3q-.8 5.3-6.6 5.3M186 47.3q4.2 4 0 8q-4.2-4 0-8M123.6 38.6q4-4.2 8 0q-4 4.2-8 0M140.2 20.2q-.8-5.3-6.6-5.3q.8 5.3 6.6 5.3M197.7 49.8q4-4.2 8 0q-4 4.2-8 0M186.2 59.7q4-4.2 8 0q-4 4.2-8 0";
-const SUMMER_LEAVES = "M118.1 30.5q.8-5.3 6.6-5.3q-.8 5.3-6.6 5.3M189.4 25.1q.8-5.3 6.6-5.3q-.8 5.3-6.6 5.3M138.4 69.3q-.8-5.3-6.6-5.3q.8 5.3 6.6 5.3M133.8 35.6q.8-5.3 6.6-5.3q-.8 5.3-6.6 5.3M198.2 39.9q4-4.2 8 0q-4 4.2-8 0M160 24.5q4-4.2 8 0q-4 4.2-8 0";
-const SUMMER_LEAVES_ALT = "M150.5 27.4q4-4.2 8 0q-4 4.2-8 0M110.1 43q4-4.2 8 0q-4 4.2-8 0M171.7 27.5q4.2 4 0 8q-4.2-4 0-8M127.2 53.2q.8-5.3 6.6-5.3q-.8 5.3-6.6 5.3M180.3 37.4q-.8-5.3-6.6-5.3q.8 5.3 6.6 5.3M176.8 20.1q.8-5.3 6.6-5.3q-.8 5.3-6.6 5.3";
+// Leaves in two colours (.leaves, .leaves.alt).
+const LEAVES = "M128.7 28.3q-.8-5.3-6.6-5.3.8 5.3 6.6 5.3M189.5 36.6q-.8-5.3-6.6-5.3.8 5.3 6.6 5.3M148.2 68.5q4-4.2 8 0-4 4.2-8 0M143.6 52.7q4-4.2 8 0-4 4.2-8 0M117.2 49.4q-.8-5.3-6.6-5.3.8 5.3 6.6 5.3M155.4 58.2q.8-5.3 6.6-5.3-.8 5.3-6.6 5.3M153.3 19q4.2 4 0 8-4.2-4 0-8M133.6 46.6q.8-5.3 6.6-5.3-.8 5.3-6.6 5.3M143.3 37.2q4-4.2 8 0-4 4.2-8 0M133.4 58.9q4-4.2 8 0-4 4.2-8 0M159.2 68.7q.8-5.3 6.6-5.3-.8 5.3-6.6 5.3M176 51.7q4-4.2 8 0-4 4.2-8 0M118.1 30.5q.8-5.3 6.6-5.3-.8 5.3-6.6 5.3M189.4 25.1q.8-5.3 6.6-5.3-.8 5.3-6.6 5.3M138.4 69.3q-.8-5.3-6.6-5.3.8 5.3 6.6 5.3M133.8 35.6q.8-5.3 6.6-5.3-.8 5.3-6.6 5.3M198.2 39.9q4-4.2 8 0-4 4.2-8 0M160 24.5q4-4.2 8 0-4 4.2-8 0";
+const LEAVES_ALT = "M168 19.7q4.2 4 0 8-4.2-4 0-8M169.4 38.3q4.2 4 0 8-4.2-4 0-8M157.9 32.9q-.8-5.3-6.6-5.3.8 5.3 6.6 5.3M164.2 50.3q4-4.2 8 0-4 4.2-8 0M181.1 28.2q4-4.2 8 0-4 4.2-8 0M121.8 59.9q.8-5.3 6.6-5.3-.8 5.3-6.6 5.3M186 47.3q4.2 4 0 8-4.2-4 0-8M123.6 38.6q4-4.2 8 0-4 4.2-8 0M140.2 20.2q-.8-5.3-6.6-5.3.8 5.3 6.6 5.3M197.7 49.8q4-4.2 8 0-4 4.2-8 0M186.2 59.7q4-4.2 8 0-4 4.2-8 0M150.5 27.4q4-4.2 8 0-4 4.2-8 0M110.1 43q4-4.2 8 0-4 4.2-8 0M171.7 27.5q4.2 4 0 8-4.2-4 0-8M127.2 53.2q.8-5.3 6.6-5.3-.8 5.3-6.6 5.3M180.3 37.4q-.8-5.3-6.6-5.3.8 5.3 6.6 5.3M176.8 20.1q.8-5.3 6.6-5.3-.8 5.3-6.6 5.3";
 
 const SOFT = 'fill="currentColor" fill-opacity=".15"';
 
-// Invisible shapes that give the sun, the moon and the tree a click target
+// Invisible shapes that give the sun and the moon a click target
 // larger than their thin lines.
-const HIT = 'fill="transparent" stroke="none"';
+const HIT = 'fill="#0000" stroke="none"';
 const SKY_HIT = `<circle cx="288" cy="20" r="14" ${HIT}/>`;
 // The rabbit links to the riddle, for the mouse only like the sun and the
-// tree, with its own larger hit area.
-const RABBIT_HIT = '<rect x="60" y="82" width="54" height="34" rx="8" fill="transparent" stroke="none"/>';
-const TREE_HIT = `<ellipse cx="160" cy="48" rx="52" ry="40" ${HIT}/><rect x="150" y="80" width="20" height="33" ${HIT}/>`;
+// moon, with its own larger hit area.
+const RABBIT_HIT = `<rect x="60" y="82" width="54" height="34" rx="8" ${HIT}/>`;
 
 // An animal pose: its body (.fur, coloured by the stylesheet), then lines.
 const pose = ([fur, lines], extra = "") => `<path class="fur" d="${fur}"/><path d="${lines}"/>${extra}`;
@@ -127,13 +117,10 @@ export const FOOTER_SCENE_SVG = `<svg class="footer-scene" viewBox="-80 0 480 13
   `<g class="cat" transform="translate(-244 56)">${poses(pose(CAT_AWAKE, `<path class="cat-tail" d="${CAT_TAIL}"/>`), pose(CAT_ASLEEP, CAT_ZZ.map((d) => `<path class="zz" d="${d}"/>`).join("")))}</g>` +
   `<g class="day-sky sun">${SKY_HIT}<path d="${SUN_DISC}" fill-opacity=".3"/><path d="${SUN_RAYS}"/></g>` +
   `<g class="night-sky"><g class="moon">${SKY_HIT}<path d="${MOON}" ${SOFT}/></g><path d="${STARS}"/>${TWINKLES.map((d) => `<path class="twinkle" d="${d}"/>`).join("")}</g>` +
-  `<g class="footer-tree">${TREE_HIT}<path d="${TRUNK}" ${SOFT}/><path d="${BRANCHES}"/>` +
+  `<g class="footer-tree"><path d="${TRUNK}" ${SOFT}/><path d="${BRANCHES}"/>` +
   `<g class="bird" transform="translate(626.8 31.9) scale(-0.75 0.75)">${poses(pose(BIRD_AWAKE), pose(BIRD_ASLEEP))}</g>` +
-  `<g class="winter-only">${FEEDER}</g>` +
   `<path class="leaves" d="${LEAVES}" fill-opacity=".3"/>` +
-  `<path class="leaves-alt" d="${LEAVES_ALT}" fill-opacity=".3"/>` +
-  `<path class="leaves summer-only" d="${SUMMER_LEAVES}" fill-opacity=".3"/>` +
-  `<path class="leaves-alt summer-only" d="${SUMMER_LEAVES_ALT}" fill-opacity=".3"/></g></svg>`;
+  `<path class="leaves alt" d="${LEAVES_ALT}" fill-opacity=".3"/></g></svg>`;
 
 // The night sky across the full width of wide screens: stars scattered from
 // a fixed seed, so they're the same on every visit, thinning out toward the
