@@ -27,13 +27,13 @@ Nearly all of the code, and this README, was written by AI (Claude), directed to
                               ▼
                     Cloudflare Static Assets
                               │
-               ┌──────────────┼──────────────┐
-               ▼              ▼              ▼
-          index.html      assets/*        fonts/*
-      (coin data inlined) (JS, CSS,      (self-hosted
-                            favicon)         Inter)
-               │              │              │
-               └──────────────┴──────────────┘
+        ┌──────────────┬──────┴───────┬──────────────┐
+        ▼              ▼              ▼              ▼
+   index.html       coins/*       assets/*        fonts/*
+   (coin list    (7-day chart     (JS, CSS,    (self-hosted
+     inlined)      per coin)      favicon)        Inter)
+        │              │              │              │
+        └──────────────┴──────┬───────┴──────────────┘
                               │
                               ▼
                           Visitors
@@ -41,11 +41,15 @@ Nearly all of the code, and this README, was written by AI (Claude), directed to
 
 `coinpeas` is an assets-only Worker — it just serves static files, with no application code on the read path. A GitHub Actions workflow does all the real work outside Cloudflare: fetching fresh coin data, rebuilding the site, and redeploying it. A separate, tiny `coinpeas-cron` Worker starts that workflow every three hours (see [Cron schedule](#cron-schedule)); it runs only on its schedule and serves no requests. Redeploying on every update, rather than running a live backend, means there's no origin server to operate — Cloudflare's edge network caches and serves the static output worldwide, and the GitHub Actions workflow is the only recurring cost surface.
 
-`data/coins.json` is inlined directly into `index.html` at build time instead of being fetched separately, trimmed by `plugins/inline-coins-data.js` to just the fields the frontend renders. `index.html` is already revalidated on every visit (it's what points visitors at the current asset hashes), so this adds no cacheability cost and saves an extra request.
+`data/coins.json` is inlined directly into `index.html` at build time instead of being fetched separately, trimmed by `plugins/inline-coins-data.js` to just the fields the coin list renders. `index.html` is already revalidated on every visit (it's what points visitors at the current asset hashes), so this adds no cacheability cost and saves an extra request.
+
+Opening a coin shows its 7-day price chart. That data isn't inlined, since most visitors never open a coin: `plugins/coin-details.js` writes one small file per coin to `coins/<generated_at in ms>/<position in the list>.json`, and the page fetches it the first time that coin is opened. The folder name is the time the data was fetched, which the page already knows from its inlined data, so the page and the files always come from the same fetch even though a coin's position changes between fetches. After a later deploy, a page that was left open asks for a folder that no longer exists, gets a 404, and asks the visitor to reload instead of showing a chart for the wrong coin.
+
+Both plugins take everything specific to this site as options in `vite.config.js`: the data file, the page and global the list is inlined into, the details folder, which fields each one keeps, and how far the sparkline is thinned out. The field lists and the sparkline step must match what `src/app.js` reads.
 
 ## Static asset caching
 
-`public/_headers` marks `assets/*` and `fonts/*` as immutable and cacheable for a year:
+`public/_headers` marks `assets/*`, `fonts/*` and `coins/*` as immutable and cacheable for a year:
 
 ```text
 /assets/*
@@ -53,9 +57,14 @@ Nearly all of the code, and this README, was written by AI (Claude), directed to
 
 /fonts/*
   Cache-Control: public, max-age=31536000, immutable
+
+/coins/*
+  Cache-Control: public, max-age=31536000, immutable
 ```
 
-`assets/*` is safe because every file there has a content hash in its filename — a change in content always means a new URL, so a stale cached copy is never served. `fonts/*` isn't hashed, but the font files are static and not expected to change; if they ever do, rename the file (and update the `@font-face`/preload references in `styles.css`/`index.html`) rather than relying on cache invalidation. `index.html` isn't covered by either rule, so it's revalidated normally — that's what points visitors at the current asset hashes, and the current coin data, after each deploy.
+`assets/*` is safe because every file there has a content hash in its filename — a change in content always means a new URL, so a stale cached copy is never served. `coins/*` is safe for the same reason: every fetch of the coin data writes its details into a new folder, so a file's contents never change at a given URL. `fonts/*` isn't hashed, but the font files are static and not expected to change; if they ever do, rename the file (and update the `@font-face`/preload references in `styles.css`/`index.html`) rather than relying on cache invalidation.
+
+`/` and `/index.html` are marked `Cache-Control: no-cache`, so browsers revalidate them on every visit — that's what points visitors at the current asset hashes, and the current coin data, after each deploy.
 
 ## Deployment
 
